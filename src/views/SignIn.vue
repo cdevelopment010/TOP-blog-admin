@@ -14,9 +14,14 @@
     </form>
 
     <p v-if="errorMessage" class="error">{{ errorMessage  }}</p>
+
+    <div>
+        <RouterLink to="/sign-up">Create Account</RouterLink>
+    </div>
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router';
 import { ref  } from 'vue';
 
 const email = ref('');
