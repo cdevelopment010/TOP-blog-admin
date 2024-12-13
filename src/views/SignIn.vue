@@ -5,10 +5,10 @@
 
     <form @submit.prevent="handleSubmit">
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" required v-model="email">
         
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" required v-model="password">
 
         <button type="submit">Login</button>
     </form>
@@ -21,8 +21,10 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import { ref  } from 'vue';
+
+const router = useRouter(); 
 
 const email = ref('');
 const password = ref(''); 
@@ -30,7 +32,7 @@ const errorMessage = ref('');
 
 const handleSubmit = async () => {
     try { 
-        const response = await fetch('...url', {
+        const response = await fetch('https://top-blog-api-production.up.railway.app/login/', {
             method: 'POST', 
             mode: 'cors',
             headers: { 'Content-Type': 'application/json'}, 
@@ -41,7 +43,11 @@ const handleSubmit = async () => {
         const data = await response.json(); 
         console.log('Login successful', data); 
 
+        // save token
+        localStorage.setItem('jwt', data.token)
+
         //redirect needed
+        router.push("/")
     } catch (err: any) {
         errorMessage.value = err.message; 
     }

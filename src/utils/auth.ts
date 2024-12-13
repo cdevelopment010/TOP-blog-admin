@@ -7,9 +7,8 @@ export function isAuthenticated(): boolean {
     try { 
         const decodeToken: any = jwtDecode(token);
         console.log(decodeToken);  
-        return true;
-        // const currentTime = Date.now() /1000; 
-        // return decodeToken.exp > currentTime; 
+        const currentTime = Date.now() /1000; 
+        return decodeToken.exp > currentTime; 
     } catch(err) { 
         return false; 
     }
