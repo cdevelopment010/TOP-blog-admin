@@ -1,7 +1,7 @@
 <template>
     <NavComponent />
     <h1>Tags</h1>
-    <RouterLink to="">Create Tag</RouterLink>
+    <RouterLink to="w">Create Tag</RouterLink>
 
     <template v-if="errorMsg">
         <span>There was an error getting the data!</span>
