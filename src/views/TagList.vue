@@ -38,6 +38,10 @@ import NavComponent from '../components/nav.vue';
 import ModalComponent from '../components/modal.vue';
 import { onMounted, ref } from "vue"; 
 
+import { currentUser } from '../utils/auth'
+
+console.log(currentUser); 
+
 
 interface Tag { 
     id:number,
@@ -76,14 +80,12 @@ const deleteTag = async (tagId: number) => {
 
 const submit = async () => {
     console.log(tagName.value); 
-
-    //issue with API - currentUser not defined.
-    //But the error message isn't coming back to the front end. 
+    // await fetch(`http://localhost:3000/tag/`, {
     await fetch(`https://top-blog-api-production.up.railway.app/tag/`, {
         mode: 'cors',
         method: 'POST', 
         headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
-        body: JSON.stringify({name: tagName.value})
+        body: JSON.stringify({name: tagName.value, currentUser: currentUser.value})
 
     })
     .then(async response => {
@@ -116,7 +118,6 @@ onMounted(async () => {
         console.log("ERROR: Tags - ",response.json)
     } else { 
         let data = await response.json(); 
-        console.log('Tags data:', data); 
         tagList.value = data.data; 
     }
 

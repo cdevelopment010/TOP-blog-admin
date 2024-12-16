@@ -1,4 +1,15 @@
 import { jwtDecode }  from 'jwt-decode'
+import { ref } from "vue"; 
+
+interface User {
+    admin: boolean, 
+    id: number, 
+    email: string, 
+    createdAt: Date, 
+    name: string, 
+    updatedAt: Date,
+}
+export const currentUser = ref<User|null>(null);
 
 export function isAuthenticated(): boolean { 
     const token = localStorage.getItem('jwt'); 

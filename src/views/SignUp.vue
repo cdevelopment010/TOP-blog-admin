@@ -29,6 +29,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router';
 import { ref  } from 'vue';
+import { currentUser } from '../utils/auth';
 
 const router = useRouter(); 
 
@@ -49,10 +50,13 @@ const handleSubmit = async () => {
         
         if (!response.ok) { throw new Error('Failed to log in')}
         const data = await response.json(); 
-        console.log('Login successful', data); 
 
         // save JWT token to local storage
         localStorage.setItem('jwt', data.token)
+
+        if (data.user) {
+            currentUser.value = data.user; 
+        }
 
         //redirect needed
         router.push("/")
