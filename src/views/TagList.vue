@@ -93,7 +93,28 @@ const submit = async () => {
             const data = await response.json(); 
             throw new Error(data.message)
         }
-        showModal.value = false;
+        
+        await fetch('https://top-blog-api-production.up.railway.app/tag/', {
+            mode: 'cors',
+            method: 'GET', 
+            headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
+
+        }).then(async response => {
+            if (!response.ok)
+            {  
+                console.log("ERROR: Tags - ",response.json)
+                return new Error(`Error ${response.json}`)
+            } else { 
+                let data = await response.json(); 
+                tagList.value = data.data; 
+                showModal.value = false;
+            }
+        }).catch( err => {
+            console.error(err); 
+        })
+
+        
+
     })
     .catch(err => {
         console.error(err); 
