@@ -1,10 +1,10 @@
 <template>
     <NavComponent />
     <h1>Tags</h1>
-    <button @click="showModal = true">Create Tag</button>
+    <button @click="showModal = true; createEditTag='Create'">Create Tag</button>
     <ModalComponent :show="showModal" @close="showModal = false">
         <template #header>
-            <h3>Create Tag</h3>
+            <h3>{{ createEditTag }} Tag</h3>
         </template>
         <template #default>
             <label for="name">Tag Name:</label>
@@ -52,6 +52,7 @@ interface Tag {
     updatedAt: Date, 
 }
 
+const createEditTag = ref<string>("Create"); 
 const showModal = ref(false);
 const tagName = ref("");
 const currentTag = ref<Tag|null>(null); 
@@ -99,7 +100,8 @@ const deleteTag = async (tagId: number) => {
     })
 }
 
-const editTag = async (tag: Tag) => {     
+const editTag = async (tag: Tag) => {
+    createEditTag.value = 'Edit';     
     tagName.value = tag.name; 
     currentTag.value = tag; 
     showModal.value = true; 
