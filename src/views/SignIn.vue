@@ -33,6 +33,7 @@ const errorMessage = ref('');
 
 const handleSubmit = async () => {
     try { 
+        // const response = await fetch('http://localhost:3000/auth/login', {
         const response = await fetch('https://top-blog-api-production.up.railway.app/auth/login', {
             method: 'POST', 
             mode: 'cors',
