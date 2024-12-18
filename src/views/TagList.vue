@@ -109,6 +109,7 @@ const editTag = async (tag: Tag) => {
 
 const submit = async () => {
     if (currentTag.value){
+        currentTag.value.name = tagName.value; 
         await fetch(`https://top-blog-api-production.up.railway.app/tag/${currentTag.value.id}`, {
             mode: 'cors',
             method: 'PUT', 
