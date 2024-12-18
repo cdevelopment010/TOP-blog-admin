@@ -1,7 +1,33 @@
 <template>
-    <NavComponent />
-    <h1>Tags</h1>
-    <button @click="showModal = true; createEditTag='Create'">Create Tag</button>
+    <div class="container">
+        <div class="nav-container">
+            <NavComponent />
+        </div>
+        <div class="body-container">
+            <h1>Tags</h1>
+            <button @click="showModal = true; createEditTag='Create'">Create Tag</button>
+
+            <template v-if="errorMsg">
+                <span>There was an error getting the data!</span>
+                <div>
+                    {{ errorMsg }}
+                </div>
+            </template>
+        
+            <template v-for="(tag, index) in tagList" :key="index">
+                <div>
+                    <span class="me-2">{{ tag?.name }}</span>
+                    <span class="me-2">{{ tag?.createdByUser }}</span>
+                    <span class="me-2">{{ new Date(tag?.createdAt).toLocaleDateString() }} {{ new Date(tag?.createdAt).toLocaleTimeString() }}</span>
+                    <div>
+                        <button @click="editTag(tag)">Edit</button>
+                        <button @click="deleteTag(tag.id)">Delete</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+        
+    </div>
     <ModalComponent :show="showModal" @close="showModal = false">
         <template #header>
             <h3>{{ createEditTag }} Tag</h3>
@@ -16,24 +42,6 @@
         </template>
     </ModalComponent>
 
-    <template v-if="errorMsg">
-        <span>There was an error getting the data!</span>
-        <div>
-            {{ errorMsg }}
-        </div>
-    </template>
-
-    <template v-for="(tag, index) in tagList" :key="index">
-        <div>
-            <span class="me-2">{{ tag?.name }}</span>
-            <span class="me-2">{{ tag?.createdByUser }}</span>
-            <span class="me-2">{{ new Date(tag?.createdAt).toLocaleDateString() }} {{ new Date(tag?.createdAt).toLocaleTimeString() }}</span>
-            <div>
-                <button @click="editTag(tag)">Edit</button>
-                <button @click="deleteTag(tag.id)">Delete</button>
-            </div>
-        </div>
-    </template>
 </template>
 
 <script setup lang="ts">

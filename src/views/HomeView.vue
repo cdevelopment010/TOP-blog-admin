@@ -1,9 +1,16 @@
 <template>
+    <div class="container">
+        <div class="nav-container">
+            <NavComponent/>
 
-    <NavComponent/>
-    <div> some cool content for my homepage</div>
+        </div>
+        <div class="body-container">
+            <h1>Home</h1>
+            <div> some cool content for my homepage</div>
+            Current route {{  $route.name }}
+        </div>
+    </div>
 
-    Current route {{  $route.name }}
 </template>
 
 <script setup lang="ts">
