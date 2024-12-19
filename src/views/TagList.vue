@@ -15,15 +15,16 @@
             </template>
         
             <template v-for="(tag, index) in tagList" :key="index">
-                <div>
-                    <span class="me-2">{{ tag?.name }}</span>
-                    <span class="me-2">{{ tag?.createdByUser }}</span>
-                    <span class="me-2">{{ new Date(tag?.createdAt).toLocaleDateString() }} {{ new Date(tag?.createdAt).toLocaleTimeString() }}</span>
-                    <div>
-                        <button @click="editTag(tag)">Edit</button>
+                <div class="d-flex align-items-center justify-content-center mb-2 mt-2">
+                    <span class="me-2 flex-start">{{ tag?.name }}</span>
+                    <span class="me-2 flex-start">{{ tag?.createdByUser }}</span>
+                    <span class="me-2 flex-start">{{ new Date(tag?.createdAt).toLocaleDateString() }} {{ new Date(tag?.createdAt).toLocaleTimeString() }}</span>
+                    <div class="d-flex flex-start">
+                        <button @click="editTag(tag)" class="me-2">Edit</button>
                         <button @click="deleteTag(tag.id)">Delete</button>
                     </div>
                 </div>
+                <hr>
             </template>
         </div>
         
@@ -33,12 +34,16 @@
             <h3>{{ createEditTag }} Tag</h3>
         </template>
         <template #default>
-            <label for="name">Tag Name:</label>
-            <input type="text" v-model="tagName" id="name" name="name" required>
+            <div>
+                <label for="name">Tag Name:</label>
+                <input type="text" v-model="tagName" id="name" name="name" required>
+            </div>
         </template>
         <template #footer>
-            <button @click="submit">Submit</button>
-            <button @click="showModal = false">Cancel</button>
+            <div class="mt-2">
+                <button @click="submit" class="me-2">Submit</button>
+                <button @click="showModal = false">Cancel</button>
+            </div>
         </template>
     </ModalComponent>
 
@@ -170,4 +175,10 @@ onMounted(async () => {
 
 <style>
     .me-2 { margin-right: 0.5rem;}
+    .mb-2 { margin-bottom: 0.5rem;}
+    .mb-3 { margin-bottom: 0.75rem;}
+    .mb-4 { margin-bottom: 1rem;}
+    .mt-2 { margin-top: 0.5rem;}
+    .mt-3 { margin-top: 0.75rem;}
+    .mt-4 { margin-top: 1rem;}
 </style>

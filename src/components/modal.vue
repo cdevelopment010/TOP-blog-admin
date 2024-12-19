@@ -1,6 +1,6 @@
 <template>
     <div v-if="show" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content d-flex flex-column align-items-center justify-content-center">
             <button class="modal-close" @click="closeModal">x</button>
             <slot name="header"></slot>
             <slot></slot>
@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 
-    import { defineProps, defineEmits } from "vue";
+    import { defineEmits } from "vue";
     
     const props = defineProps({
         show: Boolean
