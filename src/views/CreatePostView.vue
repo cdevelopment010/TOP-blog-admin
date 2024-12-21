@@ -1,73 +1,65 @@
 <template>
-    <div>
-      <button @click="fetchHtml">Load HTML</button>
-      <div v-for="(element, index) in parsedData" :key="index">
-        <DynamicElement :element="element" />
-      </div>
+  <div class="container">
+    <div class="nav-container">
+        <NavComponent />
     </div>
+    <div class="body-container">
+      <template v-for="(el, index) in html" :key="el.id">
+        <editableComponent :data="el" @update="updateHtml(index, $event)" />
+      </template>
+      <button @click="addSection">Add section</button>
+    </div>
+  </div>
   </template>
   
   
-  <script setup lang="ts">
-  import { ref } from 'vue';
-  
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import NavComponent from '../components/nav.vue';
+import editableComponent from '../components/editableComponent.vue';  
+
   // Define the structure of a parsed element
-  interface ParsedElement {
-    tag: string;
-    attributes: Record<string, string>;
-    content: string | null; // Direct text content (if any)
-    children: ParsedElement[]; // Nested elements
-  }
-  
-  const rawHtml = ref('');
-  const parsedData = ref<ParsedElement[]>([]);
-  
-  const fetchHtml = async () => {
-    // Simulate API call
-    rawHtml.value = `<section><h1>Cool title</h1><div><span>Tag information</span></div></section><section><p>paragraph 1</p><p>Paragraph 2 <a href="somelink">Here</a>.</p><img src="" alt=""></section>`;
-  
-    // Parse the HTML string
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(rawHtml.value, 'text/html');
-  
-    // Convert HTML to reactive data
-    parsedData.value = Array.from(doc.body.children).map((node) =>
-      convertNodeToElement(node)
-    );
-  };
-  const convertNodeToElement = (node: Node): ParsedElement => {
-  if (node.nodeType === Node.TEXT_NODE) {
-    // Text node handling
-    const textContent = node.textContent?.trim(); // Remove extra spaces
-    if (textContent) {
-      return {
-        tag: '', // No tag for text nodes
-        attributes: {},
-        content: textContent,
-        children: [],
-      };
-    } else {
-      // Return empty element if no text
-      return { tag: '', attributes: {}, content: null, children: [] };
-    }
+  interface element { 
+    id: number, 
+    html: string, 
+    children: element[]
+    attributes: string,
+    editing: boolean,
   }
 
-  if (node.nodeType === Node.ELEMENT_NODE) {
-    const element = node as HTMLElement;
-    const children = Array.from(element.childNodes).map(convertNodeToElement);
-
-    return {
-      tag: element.tagName.toLowerCase(),
-      attributes: Array.from(element.attributes).reduce((acc, attr) => {
-        acc[attr.name] = attr.value;
-        return acc;
-      }, {} as Record<string, string>),
-      content: null, // Elements don't have direct content, it will be handled by children
-      children: children.filter(child => child.content || child.children.length), // Only add children with content
-    };
-  }
-
-  return { tag: '', attributes: {}, content: null, children: [] }; // Default return for other cases
-};
-  </script>
+  const html = ref<element[]>([
+    {id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true}
+  ])
+  watch(html, (newVal) => {
+    console.log('HTML updated:', newVal);
+  }, { deep: true });
   
+  
+
+  function updateHtml(index: number, updatedHtml: string) {
+    console.log("UPDATE!");
+    html.value[index] = { ...html.value[index], html: updatedHtml };
+    console.log(html.value);
+  }
+  
+  function addSection() { 
+    html.value.push({id: html.value.length, html: "<section><i>placeholder...</i></section>", children: [], attributes: "", editing: true})
+    console.log(html.value);
+  
+  }
+  
+  /*
+    - Drag sections
+    - Add different sections
+      - P
+      - Code
+      - Images
+      - Ads? 
+    - Highlight for popup menu
+      - link
+      - bold 
+      - underline
+      - italic
+    - delete sections
+  */
+</script>
