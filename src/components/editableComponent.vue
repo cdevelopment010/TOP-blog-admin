@@ -9,13 +9,17 @@
             @blur="updateContent"
             @mouseover="props.data.hover = true"
             @mouseleave="props.data.hover = false"
+            @mouseup="checkSelection"
         ></div>
+        <p v-if="highlightText">
+            {{ highlightText }}
+        </p>
 
     </div>
   </template>
   
   <script setup lang="ts">
-  import { defineProps, defineEmits, reactive, watch } from "vue";
+  import { defineProps, defineEmits, reactive, ref } from "vue";
   
   // Define the interface for the element
   interface element {
@@ -27,21 +31,40 @@
     hover: boolean
   }
   
+  const highlightText = ref<string>(""); 
+  const startOffset = ref<number | null>(); 
+  const endOffset  = ref<number | null>(); 
   // Define props and emits
   const props = defineProps<{ data: element }>();
   const emit = defineEmits<{ (event: 'update', updatedHtml: string): void }>();
   
-  // Reactive variable for editable text content
   const editableText = reactive({
-    value: props.data.html, // Start with the original HTML
+    value: props.data.html, 
   });
   
-  // Function to handle updates when the user edits the contenteditable div
+  
   function updateContent(event: Event) {
-    const inputEvent = event as InputEvent; // Cast to InputEvent
+    highlightText.value =""; 
+    startOffset.value = null; 
+    endOffset.value = null; 
+    const inputEvent = event as InputEvent; 
     const target = inputEvent.target as HTMLElement;
-    editableText.value = target.innerHTML; // Update the reactive value with the new HTML
-    emit('update', editableText.value); // Emit the updated HTML back to the parent
+    editableText.value = target.innerHTML; 
+    emit('update', editableText.value); 
+  }
+
+  function checkSelection() {
+    const selection = window.getSelection(); 
+    if (selection && selection.rangeCount > 0){
+        const range = selection.getRangeAt(0);
+        highlightText.value = selection.toString(); 
+        startOffset.value = range.startOffset; 
+        endOffset.value = range.endOffset; 
+    } else {
+        highlightText.value =""; 
+        startOffset.value = null; 
+        endOffset.value = null; 
+    }
   }
   </script>
   

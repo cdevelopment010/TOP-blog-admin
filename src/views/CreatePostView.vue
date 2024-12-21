@@ -4,34 +4,38 @@
         <NavComponent />
     </div>
     <div class="body-container">
-      <template v-for="(el, index) in html" :key="el.id">
-        <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false"/>
-      </template>
+      <!-- Main section -->
+       <div>
+         <template v-for="(el, index) in html" :key="el.id">
+           <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false"/>
+         </template>
+         <div class="add-section-container">
+           <button @click.stop="togglePopup" class="add-section">
+             <i class="fa-solid fa-circle-plus fa-2x"></i>
+           
+             <!-- popup for add section -->
+             <!-- Maybe move to component -->
+             <div 
+               v-if="showPopup"
+               class="popup-menu"
+               ref="popupMenu"
+             >
+               <ul>
+                 <li @click.stop="addSection('h2')">H2</li>
+                 <li @click.stop="addSection('h2')">H3</li>
+                 <li @click.stop="addSection('h3')">H4</li>
+                 <li @click.stop="addSection('p')">Paragraph</li>
+                 <li @click.stop="addSection('img')">Image</li>
+                 <li @click.stop="addSection('code')">Code Block</li>
+                 <li @click.stop="addSection('ad')">Ad</li>
+               </ul>
+             </div>
+           </button>
+             
+         </div>
 
-      <div class="add-section-container">
-        <button @click.stop="togglePopup" class="add-section">
-          <i class="fa-solid fa-circle-plus fa-2x"></i>
-        
-          <!-- popup for add section -->
-          <!-- Maybe move to component -->
-          <div 
-            v-if="showPopup"
-            class="popup-menu"
-            ref="popupMenu"
-          >
-            <ul>
-              <li @click="addSection('h2')">H2</li>
-              <li @click="addSection('h2')">H3</li>
-              <li @click="addSection('h3')">H4</li>
-              <li @click="addSection('p')">Paragraph</li>
-              <li @click="addSection('img')">Image</li>
-              <li @click="addSection('code')">Code Block</li>
-              <li @click="addSection('ad')">Ad</li>
-            </ul>
-          </div>
-        </button>
-          
-      </div>
+       </div>
+
     </div>
     
   </div>
