@@ -1,10 +1,17 @@
 <template>
-      <!-- Display the content editable div -->
-      <div 
-        contenteditable="true" 
-        v-html="editableText.value"
-        @blur="updateContent"
-      ></div>
+    <!-- Display the content editable div -->
+    <div class="content">
+        <i v-if="props.data.hover" class="fa-solid fa-grip-vertical hover-el" @mouseenter="props.data.hover = true"></i>
+        <div 
+            
+            contenteditable="true" 
+            v-html="editableText.value"
+            @blur="updateContent"
+            @mouseover="props.data.hover = true"
+            @mouseleave="props.data.hover = false"
+        ></div>
+
+    </div>
   </template>
   
   <script setup lang="ts">
@@ -17,6 +24,7 @@
     children: element[],
     attributes: string,
     editing: boolean,
+    hover: boolean
   }
   
   // Define props and emits
@@ -37,3 +45,11 @@
   }
   </script>
   
+<style scoped>
+    .content {position: relative}
+    .hover-el { 
+        position: absolute;
+        left: 0rem;
+        cursor:grab; 
+        padding:10px; }
+</style>

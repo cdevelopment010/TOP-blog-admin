@@ -5,16 +5,41 @@
     </div>
     <div class="body-container">
       <template v-for="(el, index) in html" :key="el.id">
-        <editableComponent :data="el" @update="updateHtml(index, $event)" />
+        <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false"/>
       </template>
-      <button @click="addSection">Add section</button>
+
+      <div class="add-section-container">
+        <button @click.stop="togglePopup" class="add-section">
+          <i class="fa-solid fa-circle-plus fa-2x"></i>
+        
+          <!-- popup for add section -->
+          <!-- Maybe move to component -->
+          <div 
+            v-if="showPopup"
+            class="popup-menu"
+            ref="popupMenu"
+          >
+            <ul>
+              <li @click="addSection('h2')">H2</li>
+              <li @click="addSection('h2')">H3</li>
+              <li @click="addSection('h3')">H4</li>
+              <li @click="addSection('p')">Paragraph</li>
+              <li @click="addSection('img')">Image</li>
+              <li @click="addSection('code')">Code Block</li>
+              <li @click="addSection('ad')">Ad</li>
+            </ul>
+          </div>
+        </button>
+          
+      </div>
     </div>
+    
   </div>
   </template>
   
   
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';  
 
@@ -25,10 +50,13 @@ import editableComponent from '../components/editableComponent.vue';
     children: element[]
     attributes: string,
     editing: boolean,
+    hover: boolean,
   }
 
+  const showPopup = ref<boolean>(false); 
+  const popupMenu = ref<HTMLElement | null>(); 
   const html = ref<element[]>([
-    {id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true}
+    {id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true, hover: false}
   ])
   watch(html, (newVal) => {
     console.log('HTML updated:', newVal);
@@ -42,19 +70,28 @@ import editableComponent from '../components/editableComponent.vue';
     console.log(html.value);
   }
   
-  function addSection() { 
-    html.value.push({id: html.value.length, html: "<section><i>placeholder...</i></section>", children: [], attributes: "", editing: true})
-    console.log(html.value);
-  
+  function addSection(type: string) { 
+    if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
+      html.value.push({id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false})
+    }
+    if (type == 'img') {
+      html.value.push({id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false})
+    }
+    
+    if (type == 'code') {
+      html.value.push({id: html.value.length, html: `<code>JS code</code>`, children: [], attributes: "", editing: true, hover: false})
+    }
+    if (type == 'ad') {
+      console.error("Adding ads isn't supported yet")
+    }
+    showPopup.value = false;   
+  }
+  function togglePopup() {
+    showPopup.value = !showPopup.value; 
   }
   
   /*
     - Drag sections
-    - Add different sections
-      - P
-      - Code
-      - Images
-      - Ads? 
     - Highlight for popup menu
       - link
       - bold 
@@ -62,4 +99,47 @@ import editableComponent from '../components/editableComponent.vue';
       - italic
     - delete sections
   */
+
+  function handleClickOutside(event: MouseEvent) {
+    if (popupMenu.value && !popupMenu.value.contains(event.target as Node)){
+      showPopup.value = false; 
+    }
+  }
+  onMounted(() => {
+    document.addEventListener("click", handleClickOutside);
+  });
+
+  onBeforeUnmount(() => {
+    document.removeEventListener("click", handleClickOutside);
+  })
 </script>
+
+<style scoped>
+  .add-section-container, .add-section {position:relative;}
+
+  .popup-menu {
+    position: absolute; 
+    top: 100%; 
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 8px 0;
+    z-index: 1000;
+  }
+  .popup-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .popup-menu li {
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  .popup-menu li:hover {
+    background-color: #f0f0f0;
+  }
+</style>
