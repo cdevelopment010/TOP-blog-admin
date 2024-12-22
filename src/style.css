@@ -7,6 +7,12 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
+  --color: rgba(255, 255, 255, 0.87); 
+  --background-color: #242424;
+  --button-background: #1a1a1a; 
+  --button-color: #f9f9f9;
+
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,6 +23,10 @@
   color-scheme: dark light;
   background-color: rgba(255, 255, 255, 0.87);
   color: #242424;
+  --background-color: rgba(255, 255, 255, 0.87);
+  --color: #242424;
+  --button-background: #f9f9f9; 
+  --button-color: #1a1a1a; 
 }
 
 a {
@@ -46,7 +56,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--button-background);
+  color: var(--button-color);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -87,7 +98,7 @@ button:focus-visible {
 .justify-content-center {justify-content: center;}
 
 
-@media (prefers-color-scheme: light) {
+/* @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
@@ -98,7 +109,7 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
 
 
 @media screen and (min-width: 550px) {

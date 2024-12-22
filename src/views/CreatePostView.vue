@@ -3,9 +3,9 @@
     <div class="nav-container">
         <NavComponent />
     </div>
-    <div class="body-container">
+    <div class="body-container post-grid">
       <!-- Main section -->
-       <div>
+       <div class="create-post-section">
          <template v-for="(el, index) in html" :key="el.id">
            <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false"/>
          </template>
@@ -36,6 +36,8 @@
 
        </div>
 
+       <!-- Post settings section -->
+       <PostSettings :postSettings="postSettings"  @update="updatePostSettings($event)"/>
     </div>
     
   </div>
@@ -46,6 +48,7 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';  
+import PostSettings from '../components/postSettings.vue';
 
   // Define the structure of a parsed element
   interface element { 
@@ -57,21 +60,40 @@ import editableComponent from '../components/editableComponent.vue';
     hover: boolean,
   }
 
+  interface PostSettings { 
+    id?: number | null, 
+    slug?: string | null, 
+    tags?: [] | null, 
+    description?: string | null, 
+    keywords?: string | null
+  }
+
   const showPopup = ref<boolean>(false); 
   const popupMenu = ref<HTMLElement | null>(); 
   const html = ref<element[]>([
     {id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true, hover: false}
   ])
+  const postSettings = ref<PostSettings>({ 
+    id: null,
+    slug: '',
+    description: '', 
+    tags: [], 
+    keywords: ''
+  });
   watch(html, (newVal) => {
-    console.log('HTML updated:', newVal);
+    // console.log('HTML updated:', newVal);
   }, { deep: true });
+  // watch(postSettings, (newVal) => {
+  //   console.log('HTML updated:', newVal);
+  // }, { deep: true });
   
   
 
   function updateHtml(index: number, updatedHtml: string) {
-    console.log("UPDATE!");
     html.value[index] = { ...html.value[index], html: updatedHtml };
-    console.log(html.value);
+  }
+  function updatePostSettings(updatedPostSettings: PostSettings) {
+    postSettings.value = updatedPostSettings;
   }
   
   function addSection(type: string) { 
@@ -119,6 +141,13 @@ import editableComponent from '../components/editableComponent.vue';
 </script>
 
 <style scoped>
+  .post-grid {
+    display: grid; grid-template-columns: 8fr 2fr; 
+  }
+  .create-post-section{
+    width: 80%; 
+    margin-inline: auto;
+  }
   .add-section-container, .add-section {position:relative;}
 
   .popup-menu {
