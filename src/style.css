@@ -11,6 +11,8 @@
   --background-color: #242424;
   --button-background: #1a1a1a; 
   --button-color: #f9f9f9;
+  --accent-color-1: #646cff; 
+  --accent-color-2: #535bf2; 
 
 
   font-synthesis: none;
@@ -18,7 +20,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+* {
+  box-sizing:border-box; 
+  --webkit-box-sizing:border-box;
+}
 .light { 
   color-scheme: dark light;
   background-color: rgba(255, 255, 255, 0.87);
@@ -96,6 +101,11 @@ button:focus-visible {
 .align-items-center{align-items: center;}
 .justify-content-evenly { justify-content: space-evenly;}
 .justify-content-center {justify-content: center;}
+.flex-start {align-self: flex-start;}
+
+.mx-auto {margin-inline: auto;}
+
+.w-80 {width: 80%;}
 
 
 /* @media (prefers-color-scheme: light) {

@@ -1,13 +1,13 @@
 <template>
-    <div class="border-left">
-        <div>
-            <label for="slug">Slug:</label>
+    <div class=" w-80 mx-auto">
+        <div class="d-flex flex-column">
+            <label for="slug" class="flex-start">Slug:</label>
             <input type="text" v-model="postSettings.slug" @input="updateField('slug', postSettings.slug || '')">
             <small>{{ slugCombined }}</small>
         </div>
 
-        <div>
-            <label>Tags</label>
+        <div class="d-flex  flex-column">
+            <label class="flex-start">Tags</label>
             <select @change="addTag" v-model="currentTag">
                 <option value=""></option>
                 <option value="JS" >JS</option>
@@ -16,22 +16,22 @@
                 <option value="Vue" >Vue</option>
             </select>
             <template v-for="(tag, index) in tags">
-                <div @click="deleteTag(index)">{{ tag }}</div> 
+                <div @click="deleteTag(index)" class="pill" title="Click to remove">{{ tag }}</div> 
             </template>
         </div>
 
-        <div>
-            <label>Meta Description:</label>
+        <div class="d-flex  flex-column">
+            <label class="flex-start">Meta Description:</label>
             <textarea v-model="postSettings.description" @input="updateField('description', postSettings?.description || '')"></textarea>
         </div>
-        <div>
-            <label>Meta Keywords:</label>
+        <div class="d-flex flex-column">
+            <label class="flex-start">Meta Keywords:</label>
             <textarea v-model="postSettings.keywords" @input="updateField('keywords', postSettings?.keywords || '')"></textarea>
         </div>
     
-        <div>
-            <button class="me-2">Save & publish</button>
-            <button>Save</button>
+        <div class="mt-3">
+            <button class="me-2" @click="$emit('saveAndPublish')">Save & publish</button>
+            <button @click="$emit('save')">Save</button>
         </div>
     
     </div>
@@ -54,7 +54,11 @@ interface PostSettings {
     keywords?: string | null
 }
 const props = defineProps<{postSettings: PostSettings}>(); 
-const emit = defineEmits<{ (event: 'update', updatedSettings: any): void }>();
+const emit = defineEmits<{ 
+    (event: 'update', updatedSettings: any): void 
+    (event: 'save') : void
+    (event: 'saveAndPublish'): void
+}>();
 const postSettings = ref<PostSettings>({ ...props.postSettings });
 const tags = ref<string[]>([]);
 const currentTag = ref("");
@@ -87,5 +91,15 @@ function deleteTag(index: number) {
 </script>
 
 <style scoped>
-    .border-left {border-left: 1px solid var(--color)}
+
+    .pill {
+        margin-top: 0.25rem; 
+        border-radius: 10px; 
+        min-width: 150px; 
+        cursor: pointer;
+        background: var(--accent-color-1);
+        color: var(--background-color); 
+        border: 1px solid transparent; 
+    }
+    .pill:hover{font-weight:bold; border: 1px solid var(--color)}
 </style>

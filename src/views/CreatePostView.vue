@@ -37,7 +37,9 @@
        </div>
 
        <!-- Post settings section -->
-       <PostSettings :postSettings="postSettings"  @update="updatePostSettings($event)"/>
+        <div class="border-left">
+          <PostSettings :postSettings="postSettings"  @update="updatePostSettings($event)" @save="save($event)" @saveAndPublish="saveAndPublish($event)"/>
+        </div>
     </div>
     
   </div>
@@ -50,7 +52,6 @@ import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';  
 import PostSettings from '../components/postSettings.vue';
 
-  // Define the structure of a parsed element
   interface element { 
     id: number, 
     html: string, 
@@ -68,6 +69,26 @@ import PostSettings from '../components/postSettings.vue';
     keywords?: string | null
   }
 
+  interface Post { 
+    id?: number, 
+    title: string, 
+    content: string, 
+    numberOfView: number,
+    numberOfShares: number, 
+    published: boolean, 
+    publishedAt?: Date, 
+    publishedById?: number, 
+    createdAt?: Date, 
+    createdById?: number, 
+    updatedAt?: Date, 
+    updatedById?: number, 
+    comment: [], 
+    tagId: number, //this should be an array. Update Prisma schema. 
+    slug: string, //Add to Prisma
+    metaDescription: string, //Add to Prisma
+    metaKeywords: string, //Add to Prisma
+  }
+
   const showPopup = ref<boolean>(false); 
   const popupMenu = ref<HTMLElement | null>(); 
   const html = ref<element[]>([
@@ -81,12 +102,7 @@ import PostSettings from '../components/postSettings.vue';
     keywords: ''
   });
   watch(html, (newVal) => {
-    // console.log('HTML updated:', newVal);
-  }, { deep: true });
-  // watch(postSettings, (newVal) => {
-  //   console.log('HTML updated:', newVal);
-  // }, { deep: true });
-  
+  }, { deep: true }); 
   
 
   function updateHtml(index: number, updatedHtml: string) {
@@ -94,6 +110,14 @@ import PostSettings from '../components/postSettings.vue';
   }
   function updatePostSettings(updatedPostSettings: PostSettings) {
     postSettings.value = updatedPostSettings;
+  }
+
+  function save(updatedPostSettings: PostSettings){
+    console.log("save!")
+  }
+
+  function saveAndPublish(updatedPostSettings: PostSettings) {
+    console.log("save and publish!")
   }
   
   function addSection(type: string) { 
@@ -148,6 +172,8 @@ import PostSettings from '../components/postSettings.vue';
     width: 80%; 
     margin-inline: auto;
   }
+  
+  .border-left {border-left: 1px solid var(--color)}
   .add-section-container, .add-section {position:relative;}
 
   .popup-menu {
