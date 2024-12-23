@@ -7,7 +7,7 @@
       <!-- Main section -->
        <div class="create-post-section">
          <template v-for="(el, index) in html" :key="el.id">
-           <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false"/>
+           <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false" @addLink="showLinkModal"/>
          </template>
          <div class="add-section-container">
            <button @click.stop="togglePopup" class="add-section">
@@ -43,11 +43,31 @@
     </div>
     
   </div>
+
+
+  <ModalComponent :show="showModal" @close="showModal = false">
+        <template #header>
+            <h3>Add link</h3>
+        </template>
+        <template #default>
+            <div>
+                <input type="text" v-model="linkText" placeholder="link text">
+                <input type="text" v-model="linkUrl" placeholder="Enter URL">
+            </div>
+        </template>
+        <template #footer>
+            <div class="mt-2">
+                <button @click="addLink" class="me-2">Submit</button>
+                <button @click="showModal = false">Cancel</button>
+            </div>
+        </template>
+    </ModalComponent>
   </template>
   
   
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, reactive } from 'vue';
+import ModalComponent from '../components/modal.vue';
 import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';  
 import PostSettings from '../components/postSettings.vue';
@@ -89,6 +109,12 @@ import PostSettings from '../components/postSettings.vue';
     metaKeywords: string, //Add to Prisma
   }
 
+
+  const linkText = ref<string>(""); 
+  const linkUrl = ref<string|null>();
+  const currentElementId = ref<number|null>(null);
+
+  const showModal = ref<boolean>(false); 
   const showPopup = ref<boolean>(false); 
   const popupMenu = ref<HTMLElement | null>(); 
   const html = ref<element[]>([
@@ -119,7 +145,43 @@ import PostSettings from '../components/postSettings.vue';
   function saveAndPublish(updatedPostSettings: PostSettings) {
     console.log("save and publish!")
   }
+
+  function showLinkModal(id: number, position: number):void {
+    currentElementId.value = id; 
+    showModal.value = true; 
+  }
   
+  function addLink() {
+    const currentElement = html.value.find(r => {
+          return r.id == currentElementId.value
+        })
+
+    if (currentElement) 
+    {
+      let link = `<a href="${linkUrl.value}" target="_blank">${linkText.value}</a>`; 
+
+      const closingTagIndex = currentElement.html.lastIndexOf("</");
+      if (closingTagIndex !== -1) {
+        currentElement.html =
+        currentElement.html.slice(0, closingTagIndex) +
+        link +
+        currentElement.html.slice(closingTagIndex);
+      } else { 
+        currentElement.html += link;
+      }
+
+      html.value[currentElement.id] = currentElement;
+
+      // Reset the modal inputs and close the modal
+      linkText.value = "";
+      linkUrl.value = null;
+      showModal.value = false;
+      
+    } else { 
+      console.error("No element selected for adding a link.")
+    }
+  }
+
   function addSection(type: string) { 
     if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
       html.value.push({id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false})

@@ -107,6 +107,8 @@ button:focus-visible {
 
 .w-80 {width: 80%;}
 
+.pointer {cursor: pointer;}
+
 
 /* @media (prefers-color-scheme: light) {
   :root {

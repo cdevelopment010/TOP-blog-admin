@@ -30,8 +30,8 @@
         </div>
     
         <div class="mt-3">
-            <button class="me-2" @click="$emit('saveAndPublish')">Save & publish</button>
-            <button @click="$emit('save')">Save</button>
+            <button class="me-2" @click="$emit('saveAndPublish',postSettings)">Save & publish</button>
+            <button @click="$emit('save',postSettings)">Save</button>
         </div>
     
     </div>
@@ -56,8 +56,8 @@ interface PostSettings {
 const props = defineProps<{postSettings: PostSettings}>(); 
 const emit = defineEmits<{ 
     (event: 'update', updatedSettings: any): void 
-    (event: 'save') : void
-    (event: 'saveAndPublish'): void
+    (event: 'save', updatedSettings: PostSettings) : void
+    (event: 'saveAndPublish', updatedSettings: PostSettings): void
 }>();
 const postSettings = ref<PostSettings>({ ...props.postSettings });
 const tags = ref<string[]>([]);
