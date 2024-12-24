@@ -1,266 +1,212 @@
 <template>
   <div class="container">
     <div class="nav-container">
-        <NavComponent />
+      <NavComponent />
     </div>
     <div class="body-container post-grid">
       <!-- Main section -->
-       <div class="create-post-section">
-         <template v-for="(el, index) in html" :key="el.id">
-           <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true" @mouseleave="el.hover = false" @addLink="showLinkModal"/>
-         </template>
-         <div class="add-section-container">
-           <button @click.stop="togglePopup" class="add-section">
-             <i class="fa-solid fa-circle-plus fa-2x"></i>
-           
-             <!-- popup for add section -->
-             <!-- Maybe move to component -->
-             <div 
-               v-if="showPopup"
-               class="popup-menu"
-               ref="popupMenu"
-             >
-               <ul>
-                 <li @click.stop="addSection('h2')">H2</li>
-                 <li @click.stop="addSection('h2')">H3</li>
-                 <li @click.stop="addSection('h3')">H4</li>
-                 <li @click.stop="addSection('p')">Paragraph</li>
-                 <li @click.stop="addSection('img')">Image</li>
-                 <li @click.stop="addSection('code')">Code Block</li>
-                 <li @click.stop="addSection('ad')">Ad</li>
-               </ul>
-             </div>
-           </button>
-             
-         </div>
+      <div class="create-post-section">
+        <template v-for="(el, index) in html" :key="el.id">
+          <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true"
+            @mouseleave="el.hover = false" />
+        </template>
+        <div class="add-section-container">
+          <button @click.stop="togglePopup" class="add-section">
+            <i class="fa-solid fa-circle-plus fa-2x"></i>
 
-       </div>
+            <!-- popup for add section -->
+            <!-- Maybe move to component -->
+            <div v-if="showPopup" class="popup-menu" ref="popupMenu">
+              <ul>
+                <li @click.stop="addSection('h2')">H2</li>
+                <li @click.stop="addSection('h2')">H3</li>
+                <li @click.stop="addSection('h3')">H4</li>
+                <li @click.stop="addSection('p')">Paragraph</li>
+                <li @click.stop="addSection('img')">Image</li>
+                <li @click.stop="addSection('code')">Code Block</li>
+                <li @click.stop="addSection('ad')">Ad</li>
+              </ul>
+            </div>
+          </button>
 
-       <!-- Post settings section -->
-        <div class="border-left">
-          <PostSettings :postSettings="postSettings"  @update="updatePostSettings($event)" @save="save($event)" @saveAndPublish="saveAndPublish($event)"/>
         </div>
+
+      </div>
+
+      <!-- Post settings section -->
+      <div class="border-left">
+        <PostSettings :postSettings="postSettings" @update="updatePostSettings($event)" @save="save($event)"
+          @saveAndPublish="saveAndPublish($event)" />
+      </div>
     </div>
-    
+
   </div>
+</template>
 
 
-  <ModalComponent :show="showModal" @close="showModal = false">
-        <template #header>
-            <h3>Add link</h3>
-        </template>
-        <template #default>
-            <div>
-                <input type="text" v-model="linkText" placeholder="link text">
-                <input type="text" v-model="linkUrl" placeholder="Enter URL">
-            </div>
-        </template>
-        <template #footer>
-            <div class="mt-2">
-                <button @click="addLink" class="me-2">Submit</button>
-                <button @click="showModal = false">Cancel</button>
-            </div>
-        </template>
-    </ModalComponent>
-  </template>
-  
-  
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount, reactive } from 'vue';
-import ModalComponent from '../components/modal.vue';
 import NavComponent from '../components/nav.vue';
-import editableComponent from '../components/editableComponent.vue';  
+import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
 
-  interface element { 
-    id: number, 
-    html: string, 
-    children: element[]
-    attributes: string,
-    editing: boolean,
-    hover: boolean,
+interface element {
+  id: number,
+  html: string,
+  children: element[]
+  attributes: string,
+  editing: boolean,
+  hover: boolean,
+}
+
+interface PostSettings {
+  id?: number | null,
+  slug?: string | null,
+  tags?: [] | null,
+  description?: string | null,
+  keywords?: string | null
+}
+
+interface Post {
+  id?: number,
+  title: string,
+  content: string,
+  numberOfView: number,
+  numberOfShares: number,
+  published: boolean,
+  publishedAt?: Date,
+  publishedById?: number,
+  createdAt?: Date,
+  createdById?: number,
+  updatedAt?: Date,
+  updatedById?: number,
+  comment: [],
+  tagId: number, //this should be an array. Update Prisma schema. 
+  slug: string, //Add to Prisma
+  metaDescription: string, //Add to Prisma
+  metaKeywords: string, //Add to Prisma
+}
+
+
+const showPopup = ref<boolean>(false);
+const popupMenu = ref<HTMLElement | null>();
+const html = ref<element[]>([
+  { id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true, hover: false }
+])
+const postSettings = ref<PostSettings>({
+  id: null,
+  slug: '',
+  description: '',
+  tags: [],
+  keywords: ''
+});
+watch(html, (newVal) => {
+}, { deep: true });
+
+
+function updateHtml(index: number, updatedHtml: string) {
+  html.value[index] = { ...html.value[index], html: updatedHtml };
+}
+function updatePostSettings(updatedPostSettings: PostSettings) {
+  postSettings.value = updatedPostSettings;
+}
+
+function save(updatedPostSettings: PostSettings) {
+  console.log("save!")
+}
+
+function saveAndPublish(updatedPostSettings: PostSettings) {
+  console.log("save and publish!")
+}
+
+function addSection(type: string) {
+  if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
+    html.value.push({ id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false })
+  }
+  if (type == 'img') {
+    html.value.push({ id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false })
   }
 
-  interface PostSettings { 
-    id?: number | null, 
-    slug?: string | null, 
-    tags?: [] | null, 
-    description?: string | null, 
-    keywords?: string | null
+  if (type == 'code') {
+    html.value.push({ id: html.value.length, html: `<code>JS code</code>`, children: [], attributes: "", editing: true, hover: false })
   }
-
-  interface Post { 
-    id?: number, 
-    title: string, 
-    content: string, 
-    numberOfView: number,
-    numberOfShares: number, 
-    published: boolean, 
-    publishedAt?: Date, 
-    publishedById?: number, 
-    createdAt?: Date, 
-    createdById?: number, 
-    updatedAt?: Date, 
-    updatedById?: number, 
-    comment: [], 
-    tagId: number, //this should be an array. Update Prisma schema. 
-    slug: string, //Add to Prisma
-    metaDescription: string, //Add to Prisma
-    metaKeywords: string, //Add to Prisma
+  if (type == 'ad') {
+    console.error("Adding ads isn't supported yet")
   }
+  showPopup.value = false;
+}
+function togglePopup() {
+  showPopup.value = !showPopup.value;
+}
 
+/*
+  - Drag sections
+  - Highlight for popup menu
+    - link
+    - bold 
+    - underline
+    - italic
+  - delete sections
+*/
 
-  const linkText = ref<string>(""); 
-  const linkUrl = ref<string|null>();
-  const currentElementId = ref<number|null>(null);
-
-  const showModal = ref<boolean>(false); 
-  const showPopup = ref<boolean>(false); 
-  const popupMenu = ref<HTMLElement | null>(); 
-  const html = ref<element[]>([
-    {id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true, hover: false}
-  ])
-  const postSettings = ref<PostSettings>({ 
-    id: null,
-    slug: '',
-    description: '', 
-    tags: [], 
-    keywords: ''
-  });
-  watch(html, (newVal) => {
-  }, { deep: true }); 
-  
-
-  function updateHtml(index: number, updatedHtml: string) {
-    html.value[index] = { ...html.value[index], html: updatedHtml };
+function handleClickOutside(event: MouseEvent) {
+  if (popupMenu.value && !popupMenu.value.contains(event.target as Node)) {
+    showPopup.value = false;
   }
-  function updatePostSettings(updatedPostSettings: PostSettings) {
-    postSettings.value = updatedPostSettings;
-  }
+}
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
 
-  function save(updatedPostSettings: PostSettings){
-    console.log("save!")
-  }
-
-  function saveAndPublish(updatedPostSettings: PostSettings) {
-    console.log("save and publish!")
-  }
-
-  function showLinkModal(id: number, position: number):void {
-    currentElementId.value = id; 
-    showModal.value = true; 
-  }
-  
-  function addLink() {
-    const currentElement = html.value.find(r => {
-          return r.id == currentElementId.value
-        })
-
-    if (currentElement) 
-    {
-      let link = `<a href="${linkUrl.value}" target="_blank">${linkText.value}</a>`; 
-
-      const closingTagIndex = currentElement.html.lastIndexOf("</");
-      if (closingTagIndex !== -1) {
-        currentElement.html =
-        currentElement.html.slice(0, closingTagIndex) +
-        link +
-        currentElement.html.slice(closingTagIndex);
-      } else { 
-        currentElement.html += link;
-      }
-
-      html.value[currentElement.id] = currentElement;
-
-      // Reset the modal inputs and close the modal
-      linkText.value = "";
-      linkUrl.value = null;
-      showModal.value = false;
-      
-    } else { 
-      console.error("No element selected for adding a link.")
-    }
-  }
-
-  function addSection(type: string) { 
-    if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
-      html.value.push({id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false})
-    }
-    if (type == 'img') {
-      html.value.push({id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false})
-    }
-    
-    if (type == 'code') {
-      html.value.push({id: html.value.length, html: `<code>JS code</code>`, children: [], attributes: "", editing: true, hover: false})
-    }
-    if (type == 'ad') {
-      console.error("Adding ads isn't supported yet")
-    }
-    showPopup.value = false;   
-  }
-  function togglePopup() {
-    showPopup.value = !showPopup.value; 
-  }
-  
-  /*
-    - Drag sections
-    - Highlight for popup menu
-      - link
-      - bold 
-      - underline
-      - italic
-    - delete sections
-  */
-
-  function handleClickOutside(event: MouseEvent) {
-    if (popupMenu.value && !popupMenu.value.contains(event.target as Node)){
-      showPopup.value = false; 
-    }
-  }
-  onMounted(() => {
-    document.addEventListener("click", handleClickOutside);
-  });
-
-  onBeforeUnmount(() => {
-    document.removeEventListener("click", handleClickOutside);
-  })
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+})
 </script>
 
 <style scoped>
-  .post-grid {
-    display: grid; grid-template-columns: 8fr 2fr; 
-  }
-  .create-post-section{
-    width: 80%; 
-    margin-inline: auto;
-  }
-  
-  .border-left {border-left: 1px solid var(--color)}
-  .add-section-container, .add-section {position:relative;}
+.post-grid {
+  display: grid;
+  grid-template-columns: 8fr 2fr;
+}
 
-  .popup-menu {
-    position: absolute; 
-    top: 100%; 
-    left: 0;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    padding: 8px 0;
-    z-index: 1000;
-  }
-  .popup-menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+.create-post-section {
+  width: 80%;
+  margin-inline: auto;
+}
 
-  .popup-menu li {
-    padding: 8px 16px;
-    cursor: pointer;
-  }
+.border-left {
+  border-left: 1px solid var(--color)
+}
 
-  .popup-menu li:hover {
-    background-color: #f0f0f0;
-  }
+.add-section-container,
+.add-section {
+  position: relative;
+}
+
+.popup-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 8px 0;
+  z-index: 1000;
+}
+
+.popup-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.popup-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.popup-menu li:hover {
+  background-color: #f0f0f0;
+}
 </style>
