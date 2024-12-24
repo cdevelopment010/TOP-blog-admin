@@ -2,19 +2,21 @@
   <!-- Display the content editable div -->
   <div class="editor-container">
     <div v-if="isEditing" class="toolbar" @mousedown.prevent>
-      <span @click="applyStyle('bold')" class="pointer me-2"><b>B</b></span>
-      <span @click="applyStyle('italic')" class="pointer me-2"><i>I</i></span>
-      <span @click="addLink" class="pointer me-2"><i class="fa-solid fa-link"></i></span>
+      <div class="toolbar-border toolbar-item"><i class="fa-solid fa-grip-vertical"></i></div>
+      <div class="toolbar-border toolbar-item">
+        <span @click="applyStyle('bold')" class="pointer me-2"><b>B</b></span>
+        <span @click="applyStyle('italic')" class="pointer me-2"><i>I</i></span>
+        <span @click="addLink" class="pointer me-2">
+          <i class="fa-solid fa-link"></i>
+          
+        </span>
+      </div>
     </div>
   </div>
   <div class="content">
-    <div class="hover-el" v-if="props.data.hover" @mouseenter="props.data.hover = true">
-      <i class="fa-solid fa-grip-vertical me-2"></i>
-    </div>
     <div ref="editable" class="editable" contenteditable="true" v-html="editableText.value" role="document"
       aria-multiline="true" aria-selected="true" @focus="isEditing = true;"
-      @blur="(e) => { handleBlur(); updateContent(e) }" @mouseover="props.data.hover = true"
-      @mouseleave="props.data.hover = false" @mouseup="checkSelection" style="white-space: pre-wrap;min-width: 1px;">
+      @blur="(e) => { handleBlur(); updateContent(e) }" @mouseup="checkSelection" style="white-space: pre-wrap;min-width: 1px;">
     </div>
   </div>
 </template>
@@ -35,6 +37,7 @@ interface element {
 const selectionRange = ref<Range | null>(null);
 const isEditing = ref<boolean>(false);
 
+
 // Define props and emits
 const props = defineProps<{ data: element }>();
 const emit = defineEmits<{
@@ -51,7 +54,6 @@ watch(() => props.data.html,
   })
 
 function updateContent(event: Event) {
-
   const inputEvent = event as InputEvent;
   const target = inputEvent.target as HTMLElement;
   editableText.value = target.innerHTML;
@@ -66,9 +68,20 @@ function checkSelection() {
     selectionRange.value = null;
   }
 }
+
+function preserveSelection() {
+  // Restore the selection range when interacting with the popup
+  const selection = window.getSelection();
+  if (selection && selectionRange.value) {
+    selection.removeAllRanges();
+    selection.addRange(selectionRange.value);
+  }
+}
+
+
 function handleBlur() {
   setTimeout(() => {
-    isEditing.value = false;
+      isEditing.value = false;
   }, 250) //timeout to allow interacting with the toolbar. 
 }
 function applyStyle(style: string): void {
@@ -84,9 +97,8 @@ function applyStyle(style: string): void {
 
 function addLink() {
   if (!selectionRange.value) { return; }
-  const url = prompt("Enter URL:");
-  if (!url) { return };
-
+  const url = prompt("Url..."); 
+  if (!url) { return;}
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.target = "_blank";
@@ -122,10 +134,14 @@ function resetSelection() {
   gap: 5px;
   margin-top: 10px;
   margin-bottom: 10px;
-  padding: 5px;
   width: max-content;
-  border: 1px solid var(--color)
+  position: relative; 
 }
+.toolbar-item {
+  padding: 5px;
+}
+.toolbar-border {
+  border: 1px solid var(--color)}
 
 .toolbar button {
   padding: 5px 10px;

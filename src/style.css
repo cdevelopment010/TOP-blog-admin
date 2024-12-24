@@ -109,6 +109,33 @@ button:focus-visible {
 
 .pointer {cursor: pointer;}
 
+.popup-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 8px 0;
+  z-index: 1000;
+}
+
+.popup-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.popup-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.popup-menu li:hover {
+  background-color: #f0f0f0;
+}
+
 
 /* @media (prefers-color-scheme: light) {
   :root {

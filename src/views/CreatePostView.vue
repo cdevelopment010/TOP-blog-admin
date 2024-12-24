@@ -7,8 +7,7 @@
       <!-- Main section -->
       <div class="create-post-section">
         <template v-for="(el, index) in html" :key="el.id">
-          <editableComponent :data="el" @update="updateHtml(index, $event)" @mouseover="el.hover = true"
-            @mouseleave="el.hover = false" />
+          <editableComponent :data="el" @update="updateHtml(index, $event)"/>
         </template>
         <div class="add-section-container">
           <button @click.stop="togglePopup" class="add-section">
@@ -50,6 +49,8 @@ import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
 
+import { currentUser } from '../utils/auth'
+
 interface element {
   id: number,
   html: string,
@@ -62,7 +63,7 @@ interface element {
 interface PostSettings {
   id?: number | null,
   slug?: string | null,
-  tags?: [] | null,
+  tags?: {id: number, name: string}[] | null,
   description?: string | null,
   keywords?: string | null
 }
@@ -81,7 +82,7 @@ interface Post {
   updatedAt?: Date,
   updatedById?: number,
   comment: [],
-  tagId: number, //this should be an array. Update Prisma schema. 
+  tagId: {id: number, name: string}[] | null | undefined, //this should be an array. Update Prisma schema. 
   slug: string, //Add to Prisma
   metaDescription: string, //Add to Prisma
   metaKeywords: string, //Add to Prisma
@@ -107,16 +108,40 @@ watch(html, (newVal) => {
 function updateHtml(index: number, updatedHtml: string) {
   html.value[index] = { ...html.value[index], html: updatedHtml };
 }
-function updatePostSettings(updatedPostSettings: PostSettings) {
+ function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
+  
 }
 
-function save(updatedPostSettings: PostSettings) {
-  console.log("save!")
+async function save(updatedPostSettings: PostSettings) {
+  const post = setupPost(); 
+  // await fetch('http://localhost:3000/post/', {
+  await fetch('https://top-blog-api-production.up.railway.app/post/', {
+            mode: 'cors',
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'authorization': `bearer: ${localStorage.getItem('jwt')}` 
+            },
+            body: JSON.stringify({post: post, currentUser: currentUser.value})
+        })
+        .then(async response => {
+            if(!response.ok) {
+                const data = await response.json(); 
+                throw new Error(data.message)
+            }
+        })
+        .catch(err => {
+            console.error(err); 
+        })
 }
 
 function saveAndPublish(updatedPostSettings: PostSettings) {
-  console.log("save and publish!")
+  
+  const post = setupPost(); 
+  post.published = true, 
+  post.publishedAt = new Date(); 
+  console.log(post); 
 }
 
 function addSection(type: string) {
@@ -142,12 +167,25 @@ function togglePopup() {
 /*
   - Drag sections
   - Highlight for popup menu
-    - link
-    - bold 
     - underline
-    - italic
   - delete sections
 */
+
+function setupPost(): Post {
+  const post: Post = { 
+    title: html.value[0].html,
+    content: html.value.reduce((content,x) => {return content += x.html}, ''),
+    numberOfView: 0,
+    numberOfShares: 0,
+    published: false,
+    comment: [],
+    tagId: postSettings.value.tags, //this should be an array. Update Prisma schema. 
+    slug: postSettings.value.slug as string, //Add to Prisma
+    metaDescription: postSettings.value.description as string, //Add to Prisma
+    metaKeywords: postSettings.value.keywords as string, //Add to Prisma
+  }
+  return post; 
+}
 
 function handleClickOutside(event: MouseEvent) {
   if (popupMenu.value && !popupMenu.value.contains(event.target as Node)) {
@@ -183,30 +221,5 @@ onBeforeUnmount(() => {
   position: relative;
 }
 
-.popup-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  padding: 8px 0;
-  z-index: 1000;
-}
 
-.popup-menu ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.popup-menu li {
-  padding: 8px 16px;
-  cursor: pointer;
-}
-
-.popup-menu li:hover {
-  background-color: #f0f0f0;
-}
 </style>
