@@ -70,7 +70,7 @@ interface PostSettings {
 
 interface Post {
   id?: number,
-  title: string,
+  title: string | null,
   content: string,
   numberOfView: number,
   numberOfShares: number,
@@ -114,7 +114,8 @@ function updateHtml(index: number, updatedHtml: string) {
 }
 
 async function save(updatedPostSettings: PostSettings) {
-  const post = setupPost(); 
+  const post = setupPost();
+  console.log(post); 
   // await fetch('http://localhost:3000/post/', {
   await fetch('https://top-blog-api-production.up.railway.app/post/', {
             mode: 'cors',
@@ -141,7 +142,6 @@ function saveAndPublish(updatedPostSettings: PostSettings) {
   const post = setupPost(); 
   post.published = true, 
   post.publishedAt = new Date(); 
-  console.log(post); 
 }
 
 function addSection(type: string) {
@@ -172,8 +172,11 @@ function togglePopup() {
 */
 
 function setupPost(): Post {
+  const titleDom = new DOMParser(); 
+  const title = titleDom.parseFromString(html.value[0].html, "text/html").body.textContent;
+
   const post: Post = { 
-    title: html.value[0].html,
+    title: title,
     content: html.value.reduce((content,x) => {return content += x.html}, ''),
     numberOfView: 0,
     numberOfShares: 0,

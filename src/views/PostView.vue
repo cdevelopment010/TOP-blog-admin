@@ -9,7 +9,9 @@
             <h1>Posts</h1>
             <RouterLink to="/posts/new-post">Create Post</RouterLink>
             <template v-for="(post, index) in posts" :key="`post-${index}`">
-                {{ post.id }}
+                <div>
+                    {{ post.title }}
+                </div>
             </template>
         </div>
     </div>
