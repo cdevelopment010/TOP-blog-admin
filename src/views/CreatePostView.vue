@@ -44,12 +44,23 @@
 
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, reactive } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useRoute } from 'vue-router';
 import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
-
 import { currentUser } from '../utils/auth'
+
+
+const route = useRoute();
+
+type JsonValue = 
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: JsonValue}
+  | JsonValue[];
 
 interface element {
   id: number,
@@ -71,7 +82,7 @@ interface PostSettings {
 interface Post {
   id?: number,
   title: string | null,
-  content: string,
+  content: JsonValue ,
   numberOfView: number,
   numberOfShares: number,
   published: boolean,
@@ -88,7 +99,7 @@ interface Post {
   metaKeywords: string, //Add to Prisma
 }
 
-
+const createPost = ref<boolean>(true);
 const showPopup = ref<boolean>(false);
 const popupMenu = ref<HTMLElement | null>();
 const html = ref<element[]>([
@@ -113,13 +124,48 @@ function updateHtml(index: number, updatedHtml: string) {
   
 }
 
+async function getPostById() {
+  let url = 'https://top-blog-api-production.up.railway.app/post/'
+  if (route.params.id) { 
+    url = `https://top-blog-api-production.up.railway.app/post/${route.params.id}`
+  }
+  await fetch(url, {
+            mode: 'cors',
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'authorization': `bearer: ${localStorage.getItem('jwt')}` 
+            }
+        })
+        .then(async response => {
+            if(!response.ok) {
+                const data = await response.json(); 
+                throw new Error(data.message)
+            } else { 
+              const data = await response.json(); 
+              console.log("update post:",data.data.content)
+              html.value = JSON.parse(data.data.content);
+            }
+        })
+        .catch(err => {
+            console.error(err); 
+        })
+}
+
 async function save(updatedPostSettings: PostSettings) {
   const post = setupPost();
-  console.log(post); 
+  // console.log(route.params.id ,createPost, post); 
+  let url = 'https://top-blog-api-production.up.railway.app/post/'; 
+  let method = 'POST'; 
+  if (!createPost.value) {
+    url = `https://top-blog-api-production.up.railway.app/post/${route.params.id}`;
+    // url = `http://localhost:3000/post/${route.params.id}`;
+    method = 'PUT';
+  }
   // await fetch('http://localhost:3000/post/', {
-  await fetch('https://top-blog-api-production.up.railway.app/post/', {
+  await fetch(url, {
             mode: 'cors',
-            method: 'POST',
+            method: method,
             headers: { 
                 'Content-Type': 'application/json', 
                 'authorization': `bearer: ${localStorage.getItem('jwt')}` 
@@ -130,6 +176,9 @@ async function save(updatedPostSettings: PostSettings) {
             if(!response.ok) {
                 const data = await response.json(); 
                 throw new Error(data.message)
+            } else { 
+              const data = response.json(); 
+              console.log("success", data); 
             }
         })
         .catch(err => {
@@ -177,7 +226,7 @@ function setupPost(): Post {
 
   const post: Post = { 
     title: title,
-    content: html.value.reduce((content,x) => {return content += x.html}, ''),
+    content: JSON.stringify(html.value),
     numberOfView: 0,
     numberOfShares: 0,
     published: false,
@@ -187,6 +236,9 @@ function setupPost(): Post {
     metaDescription: postSettings.value.description as string, //Add to Prisma
     metaKeywords: postSettings.value.keywords as string, //Add to Prisma
   }
+  if (typeof route.params.id === 'string') { 
+    post.id = parseInt(route.params.id); 
+  }
   return post; 
 }
 
@@ -195,7 +247,11 @@ function handleClickOutside(event: MouseEvent) {
     showPopup.value = false;
   }
 }
-onMounted(() => {
+onMounted(async () => {
+  if (route.params.id) {
+    createPost.value = false; 
+    await getPostById()
+  }
   document.addEventListener("click", handleClickOutside);
 });
 

@@ -73,6 +73,7 @@ const refreshPosts = async () => {
 }
 
 async function publishPost(postId:number) { 
+    // await fetch(`http://localhost:3000/post/publish/${postId}`, {
     await fetch(`https://top-blog-api-production.up.railway.app/post/publish/${postId}`, {
                 mode: 'cors',
                 method: 'POST', 
@@ -91,7 +92,8 @@ async function publishPost(postId:number) {
             })
 }
 async function unpublishPost(postId:number) { 
-    await fetch(`https://top-blog-api-production.up.railway.app/post/unpublishPost/${postId}`, {
+    // await fetch(`http://localhost:3000/post/unpublish/${postId}`, {
+        await fetch(`https://top-blog-api-production.up.railway.app/post/unpublish/${postId}`, {
                 mode: 'cors',
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},

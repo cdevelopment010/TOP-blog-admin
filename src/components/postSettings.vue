@@ -123,7 +123,6 @@ const refreshTags = async (): Promise<Tag[] | void> => {
         }
 
         const data = await response.json();
-        console.log("DATA:", data.data);
         return data.data; // Ensure this is returned properly
     } catch (err) {
         console.error(err);
