@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="content">
-    <div ref="editable" class="editable" contenteditable="true" v-html="editableText.value" role="document"
+    <div ref="editable" class="editable" :contenteditable="props.data.editing" v-html="editableText.value" role="document"
       aria-multiline="true" aria-selected="true" @focus="isEditing = true;"
       @blur="(e) => { handleBlur(); updateContent(e) }" @mouseup="checkSelection" style="white-space: pre-wrap;min-width: 1px;">
     </div>

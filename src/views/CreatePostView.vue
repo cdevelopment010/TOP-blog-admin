@@ -24,6 +24,8 @@
                 <li @click.stop="addSection('img')">Image</li>
                 <li @click.stop="addSection('code')">Code Block</li>
                 <li @click.stop="addSection('ad')">Ad</li>
+                <li @click.stop="addSection('affiliate')">Affiliate Warning</li>
+                <li @click.stop="addSection('tags')">Tags</li>
               </ul>
             </div>
           </button>
@@ -121,6 +123,7 @@ function updateHtml(index: number, updatedHtml: string) {
 }
  function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
+  generateTags(); 
   
 }
 
@@ -192,6 +195,23 @@ function saveAndPublish(updatedPostSettings: PostSettings) {
   post.published = true, 
   post.publishedAt = new Date(); 
 }
+function generateTags() : void { 
+  let tagSection = document.getElementById('tag-section'); 
+  if (tagSection) { 
+    tagSection.innerHTML = ""; 
+    postSettings.value.tags?.forEach(tag => {
+      let t = document.createElement('div'); 
+      t.classList.add('pill')
+      t.classList.add('me-2')
+      t.innerText = tag.name; 
+      tagSection.appendChild(t);
+      console.log(t);
+    })
+  } else { 
+    console.warn("no tag section")
+    return; 
+  }
+}
 
 function addSection(type: string) {
   if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
@@ -200,7 +220,16 @@ function addSection(type: string) {
   if (type == 'img') {
     html.value.push({ id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false })
   }
+  if (type == 'affiliate') {
+    html.value.push({id: html.value.length, html: `<section><i>Disclosure: This post may contain affiliate links, meaning I get a commission if you decide to make a purchase through my links, at no cost to you.</i></section>`, children: [], attributes: "", editing: false, hover: false})
+  }
 
+  if (type == 'tags') {
+    html.value.push({ id: html.value.length, html: `<section id='tag-section' class='d-flex align-items-center justify-content-center'></section>`, children: [], attributes: "", editing: false, hover: false })
+    setTimeout(() => {
+      generateTags();
+    }, 250);  
+  }
   if (type == 'code') {
     html.value.push({ id: html.value.length, html: `<code>JS code</code>`, children: [], attributes: "", editing: true, hover: false })
   }
@@ -279,6 +308,7 @@ onBeforeUnmount(() => {
 .add-section {
   position: relative;
 }
+
 
 
 </style>

@@ -54,6 +54,9 @@ h1 {
   line-height: 1.1;
 }
 
+p { text-align: left;}
+section { text-align: left;}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -103,11 +106,23 @@ button:focus-visible {
 .justify-content-center {justify-content: center;}
 .flex-start {align-self: flex-start;}
 
+
 .mx-auto {margin-inline: auto;}
 
 .w-80 {width: 80%;}
 
 .pointer {cursor: pointer;}
+
+.pill {
+  margin-top: 0.25rem;
+  border-radius: 10px;
+  min-width: 150px;
+  cursor: pointer;
+  background: var(--accent-color-1);
+  color: var(--background-color);
+  border: 1px solid transparent;
+  text-align: center;
+}
 
 .popup-menu {
   position: absolute;
