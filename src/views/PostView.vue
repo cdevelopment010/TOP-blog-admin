@@ -30,7 +30,7 @@
                             </td>
                             <td>
                                 <RouterLink :to="`/posts/update-post/${post.id}`" class="btn me-2">Update</RouterLink>
-                                <button class="btn me-2">Delete</button>
+                                <button class="btn me-2" @click="deletePost(post.id)">Delete</button>
                                 <RouterLink :to="`/posts/preview-post/${post.id}`" class="btn">Preview</RouterLink>
                             </td>
                         </tr>
@@ -122,7 +122,27 @@ async function changePostPublish(published: boolean, postId: number): Promise<vo
 
     //refresh post after changes
     await refreshPosts(); 
+}
 
+async function deletePost(id: number) : Promise<void> {
+
+    //need some sort of warning here.
+    await fetch(`https://top-blog-api-production.up.railway.app/post/${id}`, {
+        mode: 'cors',
+        method: 'DELETE', 
+        headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
+
+    })
+    .then(async response => {
+        if(!response.ok) {
+            const data = await response.json(); 
+            throw new Error(data.message)
+        }
+        await refreshPosts(); 
+    })
+    .catch(err => {
+        console.error(err);  
+    })
 }
 
 onMounted(async () => {
