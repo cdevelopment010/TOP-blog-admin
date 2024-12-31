@@ -7,7 +7,7 @@
       <!-- Main section -->
       <div class="create-post-section">
         <template v-for="(el, index) in html" :key="el.id">
-          <editableComponent :data="el" @update="updateHtml(index, $event)"/>
+          <editableComponent :data="el" @update="updateHtml(index, $event)" @setDeleted="deleteSection"/>
         </template>
         <div class="add-section-container">
           <button @click.stop="togglePopup" class="add-section">
@@ -71,6 +71,7 @@ interface element {
   attributes: string,
   editing: boolean,
   hover: boolean,
+  deleted?: boolean
 }
 
 interface PostSettings {
@@ -117,9 +118,17 @@ const postSettings = ref<PostSettings>({
 watch(html, (newVal) => {
 }, { deep: true });
 
+let isDeleting = false;
 
+function deleteSection(id: number) {
+  isDeleting = true; // Disable updateHtml temporarily
+  html.value = html.value.filter((section) => section.id !== id);
+  setTimeout(() => (isDeleting = false), 0); // Re-enable after deletion
+}
 function updateHtml(index: number, updatedHtml: string) {
+  if (isDeleting) return;
   html.value[index] = { ...html.value[index], html: updatedHtml };
+  
 }
  function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;

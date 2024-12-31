@@ -8,8 +8,10 @@
         <span @click="applyStyle('italic')" class="pointer me-2"><i>I</i></span>
         <span @click="addLink" class="pointer me-2">
           <i class="fa-solid fa-link"></i>
-          
         </span>
+      </div>
+      <div class="toolbar-border toolbar-item"> 
+        <span @click="deleteSection"><i class="fa-solid fa-trash"></i></span>
       </div>
     </div>
   </div>
@@ -31,7 +33,8 @@ interface element {
   children: element[],
   attributes: string,
   editing: boolean,
-  hover: boolean
+  hover: boolean, 
+  deleted?: boolean,
 }
 
 const selectionRange = ref<Range | null>(null);
@@ -41,7 +44,8 @@ const isEditing = ref<boolean>(false);
 // Define props and emits
 const props = defineProps<{ data: element }>();
 const emit = defineEmits<{
-  (event: 'update', updatedHtml: string): void
+  (event: 'update', updatedHtml: string): void,
+  (event: 'setDeleted', id: number): void, 
 }>();
 
 const editableText = reactive({
@@ -76,6 +80,10 @@ function preserveSelection() {
     selection.removeAllRanges();
     selection.addRange(selectionRange.value);
   }
+}
+
+function deleteSection() { 
+  emit('setDeleted', props.data.id);
 }
 
 
