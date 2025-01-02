@@ -7,7 +7,12 @@
       <!-- Main section -->
       <div class="create-post-section">
         <template v-for="(el, index) in html" :key="el.id">
-          <editableComponent :data="el" @update="updateHtml(index, $event)" @setDeleted="deleteSection"/>
+          <editableComponent :data="el" 
+            @update="updateHtml(index, $event)" 
+            @setDeleted="deleteSection"
+            @moveUp="moveUp(index)"
+            @moveDown="moveDown(index)"
+            />
         </template>
         <div class="add-section-container">
           <button @click.stop="togglePopup" class="add-section">
@@ -126,14 +131,28 @@ function deleteSection(id: number) {
   setTimeout(() => (isDeleting = false), 0); // Re-enable after deletion
 }
 function updateHtml(index: number, updatedHtml: string) {
-  if (isDeleting) return;
-  html.value[index] = { ...html.value[index], html: updatedHtml };
-  
+  if (isDeleting || isMoving) return;
+  html.value[index] = { ...html.value[index], html: updatedHtml };  
 }
  function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
   generateTags(); 
-  
+}
+let isMoving = false; 
+function moveUp(index: number) { 
+  isMoving = true; 
+  if (index <= 1) { return }
+  [html.value[index-1], html.value[index]] = [html.value[index], html.value[index-1]];
+  setTimeout(() => {isMoving = false}, 0);
+
+}
+
+function moveDown(index: number) { 
+  isMoving = true; 
+  if (index >= html.value.length) { return }
+  [html.value[index], html.value[index+1]] = [html.value[index+1], html.value[index]];
+  setTimeout(() => {isMoving = false}, 0);
+
 }
 
 async function getPostById() {

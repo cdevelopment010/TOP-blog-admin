@@ -4,6 +4,10 @@
     <div v-if="isEditing" class="toolbar" @mousedown.prevent>
       <div class="toolbar-border toolbar-item"><i class="fa-solid fa-grip-vertical"></i></div>
       <div class="toolbar-border toolbar-item">
+        <span style="padding: 0.5rem;" @click="$emit('moveUp')"><i class="fa-solid fa-caret-up pointer"></i></span>
+        <span style="padding: 0.5rem;" @click="$emit('moveDown')"><i class="fa-solid fa-caret-down pointer"></i></span>
+      </div>
+      <div class="toolbar-border toolbar-item">
         <span @click="applyStyle('bold')" class="pointer me-2"><b>B</b></span>
         <span @click="applyStyle('italic')" class="pointer me-2"><i>I</i></span>
         <span @click="addLink" class="pointer me-2">
@@ -46,6 +50,8 @@ const props = defineProps<{ data: element }>();
 const emit = defineEmits<{
   (event: 'update', updatedHtml: string): void,
   (event: 'setDeleted', id: number): void, 
+  (event: 'moveUp') : void,
+  (event: 'moveDown') : void
 }>();
 
 const editableText = reactive({
