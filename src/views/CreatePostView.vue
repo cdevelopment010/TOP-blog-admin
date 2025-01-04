@@ -61,6 +61,14 @@ import { currentUser } from '../utils/auth'
 
 const route = useRoute();
 
+declare global {
+  interface Window {
+    adsbygoogle: any;
+  }
+}
+
+const adsbygoogle = window.adsbygoogle || [];
+
 type JsonValue = 
   | string
   | number
@@ -259,16 +267,42 @@ function addSection(type: string) {
     }, 250);  
   }
   if (type == 'code') {
-    // let lang = prompt("Which language is the code?"); 
-    // if (!lang) {
-    //   console.error("No language added"); 
-    //   return; 
-    // }
+    let lang = prompt("Which language is the code?"); 
+    if (!lang) {
+      console.error("No language added"); 
+      return; 
+    }
 
     html.value.push({ id: html.value.length, html: `<pre><code>code</code></pre>`, children: [], attributes: "", editing: true, hover: false })
   }
   if (type == 'ad') {
     console.error("Adding ads isn't supported yet")
+      const adHtml = `
+      <div align="center">
+        <ins class="adsbygoogle"
+            style="display:block; text-align:center;"
+            data-ad-layout="in-article"
+            data-ad-format="fluid"
+            data-ad-client="ca-pub-7371197725995262"
+            data-ad-slot="3466167982"></ins>
+      </div>
+    `;
+    html.value.push({
+      id: html.value.length,
+      html: adHtml,
+      children: [],
+      attributes: "",
+      editing: false,
+      hover: false
+    });
+
+    // setTimeout(() => {
+    //   try {
+    //     (adsbygoogle = window.adsbygoogle || []).push({});
+    //   } catch (err) {
+    //     console.error("Google Ads error:", err);
+    //   }
+    // }, 0);
   }
   showPopup.value = false;
 }
