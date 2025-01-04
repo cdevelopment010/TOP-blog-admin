@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, reactive, ref, watch } from "vue";
+import { defineEmits, onBeforeMount, onMounted, reactive, ref, watch } from "vue";
 
 // Define the interface for the element
 interface element {
@@ -100,6 +100,8 @@ function resetSelection() {
   const selection = window.getSelection();
   if (selection) { selection.removeAllRanges(); }
 }
+
+
 
 </script>
 

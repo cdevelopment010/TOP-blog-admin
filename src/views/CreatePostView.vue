@@ -277,16 +277,7 @@ function addSection(type: string) {
   }
   if (type == 'ad') {
     console.error("Adding ads isn't supported yet")
-      const adHtml = `
-      <div align="center">
-        <ins class="adsbygoogle"
-            style="display:block; text-align:center;"
-            data-ad-layout="in-article"
-            data-ad-format="fluid"
-            data-ad-client="ca-pub-7371197725995262"
-            data-ad-slot="3466167982"></ins>
-      </div>
-    `;
+      const adHtml = `<div align="center" class="ads"></div>`;
     html.value.push({
       id: html.value.length,
       html: adHtml,
@@ -295,14 +286,6 @@ function addSection(type: string) {
       editing: false,
       hover: false
     });
-
-    // setTimeout(() => {
-    //   try {
-    //     (adsbygoogle = window.adsbygoogle || []).push({});
-    //   } catch (err) {
-    //     console.error("Google Ads error:", err);
-    //   }
-    // }, 0);
   }
   showPopup.value = false;
 }
@@ -344,10 +327,12 @@ function handleClickOutside(event: MouseEvent) {
     showPopup.value = false;
   }
 }
+
+
 onMounted(async () => {
   if (route.params.id) {
     createPost.value = false; 
-    await getPostById()
+    await getPostById(); 
   }
   document.addEventListener("click", handleClickOutside);
 });

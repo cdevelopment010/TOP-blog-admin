@@ -17,7 +17,7 @@
   
   
   <script setup lang="ts">
-  import { ref, watch, onMounted} from 'vue';
+  import { ref, watch, onMounted, nextTick} from 'vue';
   import { useRoute } from 'vue-router';
   import NavComponent from '../components/nav.vue';
   import PreviewComponent from '../components/previewComponent.vue';
@@ -81,6 +81,7 @@
     keywords: ''
   });
   watch(html, (newVal) => {
+    loadGoogleAds(); 
   }, { deep: true });
   
   
@@ -107,12 +108,41 @@
                 const data = await response.json(); 
                 console.log("update post:",data.data.content)
                 html.value = JSON.parse(data.data.content);
+                loadGoogleAds(); 
               }
           })
           .catch(err => {
               console.error(err); 
           })
   }
+
+  function loadGoogleAds() {
+  nextTick(() => {
+    const ads = document.getElementsByClassName("ads");
+    console.log("ads", ads);
+
+    for (const ad of ads) {
+      const adElement = ad as HTMLElement;
+      if (!adElement.dataset.adLoaded) {
+        adElement.innerHTML = `
+          <ins class="adsbygoogle"
+               style="display:block; text-align:center;"
+               data-ad-layout="in-article"
+               data-ad-format="fluid"
+               data-ad-client="ca-pub-7371197725995262"
+               data-ad-slot="3466167982">
+          </ins>
+        `;
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          adElement.dataset.adLoaded = "true"; // Mark this ad as loaded
+        } catch (err) {
+          console.error("Error initializing adsbygoogle:", err);
+        }
+      }
+    }
+  });
+}
   
   onMounted(async () => {
     await getPostById(); 
