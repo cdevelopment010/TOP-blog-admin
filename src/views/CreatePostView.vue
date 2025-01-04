@@ -259,7 +259,13 @@ function addSection(type: string) {
     }, 250);  
   }
   if (type == 'code') {
-    html.value.push({ id: html.value.length, html: `<code>JS code</code>`, children: [], attributes: "", editing: true, hover: false })
+    // let lang = prompt("Which language is the code?"); 
+    // if (!lang) {
+    //   console.error("No language added"); 
+    //   return; 
+    // }
+
+    html.value.push({ id: html.value.length, html: `<pre><code>code</code></pre>`, children: [], attributes: "", editing: true, hover: false })
   }
   if (type == 'ad') {
     console.error("Adding ads isn't supported yet")
