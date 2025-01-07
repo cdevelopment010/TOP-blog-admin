@@ -184,6 +184,12 @@ async function getPostById() {
               const data = await response.json(); 
               console.log("update post:",data.data.content)
               html.value = JSON.parse(data.data.content);
+
+              postSettings.value.description = data.data.metaDescription;
+              postSettings.value.keywords = data.data.metaKeywords; 
+              postSettings.value.slug = data.data.slug;
+
+              //fix - data.data doesn't contain tags. 
             }
         })
         .catch(err => {
