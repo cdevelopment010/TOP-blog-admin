@@ -2,7 +2,7 @@
     <div class=" w-80 mx-auto">
         <div class="d-flex flex-column">
             <label for="slug" class="flex-start">Slug:</label>
-            <input type="text" v-model="postSettings.slug" @input="updateField('slug', postSettings.slug || '');updateField('slugCombined', slugCombined)">
+            <input type="text" v-model="postSettings.slug" @input="updateField('slug', postSettings.slug || '')">
             <small>{{ slugCombined }}</small>
         </div>
 
@@ -59,7 +59,6 @@ interface Tag {
 interface PostSettings {
     id?: number | null,
     slug?: string | null,
-    slugCombined?: string | null,
     tags?: {id: number, name: string}[] | null,
     description?: string | null,
     keywords?: string | null
