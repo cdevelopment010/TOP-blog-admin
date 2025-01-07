@@ -90,6 +90,7 @@ interface element {
 interface PostSettings {
   id?: number | null,
   slug?: string | null,
+  slugCombined?: string | null,
   tags?: {id: number, name: string}[] | null,
   description?: string | null,
   keywords?: string | null
@@ -124,6 +125,7 @@ const html = ref<element[]>([
 const postSettings = ref<PostSettings>({
   id: null,
   slug: '',
+  slugCombined: '',
   description: '',
   tags: [],
   keywords: ''
@@ -318,7 +320,7 @@ function setupPost(): Post {
     published: false,
     comment: [],
     tagId: postSettings.value.tags, //this should be an array. Update Prisma schema. 
-    slug: postSettings.value.slug as string, //Add to Prisma
+    slug: postSettings.value.slugCombined as string, //Add to Prisma
     metaDescription: postSettings.value.description as string, //Add to Prisma
     metaKeywords: postSettings.value.keywords as string, //Add to Prisma
   }
