@@ -88,9 +88,9 @@
 
   
   async function getPostById() {
-    let url = 'https://top-blog-api-production.up.railway.app/post/'
+    let url = 'https://top-blog-api-proud-thunder-6960.fly.dev/post/'
     if (route.params.id) { 
-      url = `https://top-blog-api-production.up.railway.app/post/${route.params.id}`
+      url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${route.params.id}`
     }
     await fetch(url, {
               mode: 'cors',

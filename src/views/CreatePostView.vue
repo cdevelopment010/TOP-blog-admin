@@ -164,9 +164,9 @@ function moveDown(index: number) {
 }
 
 async function getPostById() {
-  let url = 'https://top-blog-api-production.up.railway.app/post/'
+  let url = 'https://top-blog-api-proud-thunder-6960.fly.dev/post/'
   if (route.params.id) { 
-    url = `https://top-blog-api-production.up.railway.app/post/${route.params.id}`
+    url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${route.params.id}`
   }
   await fetch(url, {
             mode: 'cors',
@@ -200,10 +200,10 @@ async function getPostById() {
 async function save(updatedPostSettings: PostSettings) {
   const post = setupPost();
   // console.log(route.params.id ,createPost, post); 
-  let url = 'https://top-blog-api-production.up.railway.app/post/'; 
+  let url = 'https://top-blog-api-proud-thunder-6960.fly.dev/post/'; 
   let method = 'POST'; 
   if (!createPost.value) {
-    url = `https://top-blog-api-production.up.railway.app/post/${route.params.id}`;
+    url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${route.params.id}`;
     // url = `http://localhost:3000/post/${route.params.id}`;
     method = 'PUT';
   }

@@ -73,7 +73,7 @@ const tagList = ref<Tag[]>([]);
 const errorMsg = ref(""); 
 
 const refreshTags = async () => {
-    await fetch('https://top-blog-api-production.up.railway.app/tag/', {
+    await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/tag/', {
                 mode: 'cors',
                 method: 'GET', 
                 headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
@@ -94,7 +94,7 @@ const refreshTags = async () => {
 }
 
 const deleteTag = async (tagId: number) => {
-    await fetch(`https://top-blog-api-production.up.railway.app/tag/${tagId}`, {
+    await fetch(`https://top-blog-api-proud-thunder-6960.fly.dev/tag/${tagId}`, {
         mode: 'cors',
         method: 'DELETE', 
         headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
@@ -125,7 +125,7 @@ const editTag = async (tag: Tag) => {
 const submit = async () => {
     if (currentTag.value){
         currentTag.value.name = tagName.value; 
-        await fetch(`https://top-blog-api-production.up.railway.app/tag/${currentTag.value.id}`, {
+        await fetch(`https://top-blog-api-proud-thunder-6960.fly.dev/tag/${currentTag.value.id}`, {
             mode: 'cors',
             method: 'PUT', 
             headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
@@ -144,7 +144,7 @@ const submit = async () => {
         })
     } else { 
         // await fetch(`http://localhost:3000/tag/`, {
-        await fetch(`https://top-blog-api-production.up.railway.app/tag/`, {
+        await fetch(`https://top-blog-api-proud-thunder-6960.fly.dev/tag/`, {
             mode: 'cors',
             method: 'POST', 
             headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},

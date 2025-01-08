@@ -53,7 +53,8 @@ interface Post {
 const posts = ref();
 
 const refreshPosts = async () => {
-    await fetch('https://top-blog-api-production.up.railway.app/post/', {
+    // await fetch('https://top-blog-api-production.up.railway.app/post/', {
+    await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/post/', {
                 mode: 'cors',
                 method: 'GET', 
                 headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
@@ -74,7 +75,7 @@ const refreshPosts = async () => {
 
 async function publishPost(postId:number) { 
     // await fetch(`http://localhost:3000/post/publish/${postId}`, {
-    await fetch(`https://top-blog-api-production.up.railway.app/post/publish/${postId}`, {
+    await fetch(`https://top-blog-api-proud-thunder-6960.fly.dev/post/publish/${postId}`, {
                 mode: 'cors',
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
@@ -93,7 +94,7 @@ async function publishPost(postId:number) {
 }
 async function unpublishPost(postId:number) { 
     // await fetch(`http://localhost:3000/post/unpublish/${postId}`, {
-        await fetch(`https://top-blog-api-production.up.railway.app/post/unpublish/${postId}`, {
+        await fetch(`https://top-blog-api-proud-thunder-6960.fly.dev/post/unpublish/${postId}`, {
                 mode: 'cors',
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
@@ -127,7 +128,7 @@ async function changePostPublish(published: boolean, postId: number): Promise<vo
 async function deletePost(id: number) : Promise<void> {
 
     //need some sort of warning here.
-    await fetch(`https://top-blog-api-production.up.railway.app/post/${id}`, {
+    await fetch(`https://top-blog-api-proud-thunder-6960.fly.dev/post/${id}`, {
         mode: 'cors',
         method: 'DELETE', 
         headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},

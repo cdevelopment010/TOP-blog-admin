@@ -41,7 +41,7 @@ const errorMessage = ref('');
 
 const handleSubmit = async () => {
     try { 
-        const response = await fetch('https://top-blog-api-production.up.railway.app/user/', {
+        const response = await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/user/', {
             method: 'POST', 
             mode: 'cors',
             headers: { 'Content-Type': 'application/json'}, 
