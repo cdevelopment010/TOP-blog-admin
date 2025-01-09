@@ -47,6 +47,24 @@
     </div>
 
   </div>
+
+  <Modal :show="showModal" @close="showModal = false">
+        <template #header>
+            <h3>Upload / Select images</h3>
+        </template>
+        <template #default>
+            <div>
+              <ExisitingImages @select-image="updateImageUrl"/>
+              <UploadingImage @upload-image="updateImageUrl"/>
+            </div>
+        </template>
+        <template #footer>
+            <div class="mt-2">
+                <button @click="submitImage" class="me-2">Submit</button>
+                <button @click="showModal = false">Cancel</button>
+            </div>
+        </template>
+    </Modal>
 </template>
 
 
@@ -56,7 +74,10 @@ import { useRoute } from 'vue-router';
 import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
+import Modal from '../components/modal.vue';
 import { currentUser } from '../utils/auth'
+import ExisitingImages from '../components/exisitingImages.vue';
+import UploadingImage from '../components/uploadingImage.vue';
 
 
 const route = useRoute();
@@ -115,6 +136,8 @@ interface Post {
   metaKeywords: string, //Add to Prisma
 }
 
+const showModal = ref(); 
+const imageUrl = ref<string | null>(); 
 const createPost = ref<boolean>(true);
 const showPopup = ref<boolean>(false);
 const popupMenu = ref<HTMLElement | null>();
@@ -260,7 +283,8 @@ function addSection(type: string) {
     html.value.push({ id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false })
   }
   if (type == 'img') {
-    html.value.push({ id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false })
+    showModal.value = true; 
+    // html.value.push({ id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false })
   }
   if (type == 'affiliate') {
     html.value.push({id: html.value.length, html: `<section><i>Disclosure: This post may contain affiliate links, meaning I get a commission if you decide to make a purchase through my links, at no cost to you.</i></section>`, children: [], attributes: "", editing: false, hover: false})
@@ -332,6 +356,16 @@ function handleClickOutside(event: MouseEvent) {
   if (popupMenu.value && !popupMenu.value.contains(event.target as Node)) {
     showPopup.value = false;
   }
+}
+
+function updateImageUrl(url : string | null) : void { 
+  imageUrl.value = url; 
+  console.log("Image URL", imageUrl.value);
+}
+
+function submitImage(): void { 
+  html.value.push({ id: html.value.length, html: `<img src="${imageUrl.value}" alt=""/>`, children: [], attributes: "", editing: true, hover: false }); 
+  showModal.value = false; 
 }
 
 
