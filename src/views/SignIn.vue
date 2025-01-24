@@ -24,6 +24,7 @@
 import { RouterLink, useRouter } from 'vue-router';
 import { ref  } from 'vue';
 import { currentUser } from '../utils/auth'
+import { supabase } from '../utils/supabase';
 
 const router = useRouter(); 
 
@@ -33,8 +34,16 @@ const errorMessage = ref('');
 
 const handleSubmit = async () => {
     try { 
-        // const response = await fetch('http://localhost:3000/auth/login', {
-        // const response = await fetch('https://top-blog-api-production.up.railway.app/auth/login', {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email.value, 
+            password: password.value
+        })
+
+        if (error) {
+            throw new Error(error.message);
+        }
+        console.log("Log in!", data);
+
         const response = await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/auth/login', {
             method: 'POST', 
             mode: 'cors',
@@ -43,12 +52,12 @@ const handleSubmit = async () => {
         })
         
         if (!response.ok) { throw new Error('Failed to log in')}
-        const data = await response.json(); 
+        const dataResponse = await response.json(); 
         // save token
-        localStorage.setItem('jwt', data.token)
+        localStorage.setItem('jwt', dataResponse.token)
         //save current user
         if (data.user) {
-            currentUser.value = data.user; 
+            currentUser.value = dataResponse.user; 
         }
 
         //redirect needed

@@ -3,7 +3,7 @@
         Create Account
     </h1>
 
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="signUpWithEmail(email, password)">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required v-model="name">
 
@@ -30,6 +30,7 @@
 import { RouterLink, useRouter } from 'vue-router';
 import { ref  } from 'vue';
 import { currentUser } from '../utils/auth';
+import { supabase } from '../utils/supabase';
 
 const router = useRouter(); 
 
@@ -39,13 +40,20 @@ const confirmPassword = ref('');
 const name=ref('');
 const errorMessage = ref(''); 
 
-const handleSubmit = async () => {
+
+async function signUpWithEmail(email: string, password: string) {
+
+  const {data, error } = await supabase.auth.signUp({ email, password });
+  if (error) {
+    console.error('Error signing up:', error.message);
+  } else {
+    console.log('Sign-up successful:', data);
     try { 
         const response = await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/user/', {
             method: 'POST', 
             mode: 'cors',
             headers: { 'Content-Type': 'application/json'}, 
-            body: JSON.stringify({ email: email.value, password: password.value, confirmPassword: confirmPassword.value, name: name.value, admin: true})
+            body: JSON.stringify({ email: email, password: password, confirmPassword: confirmPassword.value, name: name.value, admin: true})
         })
         
         if (!response.ok) { throw new Error('Failed to log in')}
@@ -64,6 +72,8 @@ const handleSubmit = async () => {
     } catch (err: any) {
         errorMessage.value = err.message; 
     }
+  }
 }
+
 
 </script>
