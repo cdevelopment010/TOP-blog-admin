@@ -27,6 +27,7 @@
                 <li @click.stop="addSection('h3')">H4</li>
                 <li @click.stop="addSection('p')">Paragraph</li>
                 <li @click.stop="addSection('img')">Image</li>
+                <li @click.stop="addSection('header-img')">Header Image</li>
                 <li @click.stop="addSection('code')">Code Block</li>
                 <li @click.stop="addSection('ad')">Ad</li>
                 <li @click.stop="addSection('affiliate')">Affiliate Warning</li>
