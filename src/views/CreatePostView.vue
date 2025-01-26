@@ -138,6 +138,7 @@ interface Post {
 
 const showModal = ref(); 
 const imageUrl = ref<string | null>(); 
+const headerImg = ref<boolean>(false);
 const createPost = ref<boolean>(true);
 const showPopup = ref<boolean>(false);
 const popupMenu = ref<HTMLElement | null>();
@@ -283,8 +284,12 @@ function addSection(type: string) {
     html.value.push({ id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false })
   }
   if (type == 'img') {
+    headerImg.value = false;
     showModal.value = true; 
-    // html.value.push({ id: html.value.length, html: `<img src="" alt=""/>`, children: [], attributes: "", editing: true, hover: false })
+  }
+  if (type == 'header-img') {
+    headerImg.value = true;
+    showModal.value = true; 
   }
   if (type == 'affiliate') {
     html.value.push({id: html.value.length, html: `<section><i>Disclosure: This post may contain affiliate links, meaning I get a commission if you decide to make a purchase through my links, at no cost to you.</i></section>`, children: [], attributes: "", editing: false, hover: false})
@@ -364,7 +369,11 @@ function updateImageUrl(url : string | null) : void {
 }
 
 function submitImage(): void { 
-  html.value.push({ id: html.value.length, html: `<img src="${imageUrl.value}" alt=""/>`, children: [], attributes: "", editing: true, hover: false }); 
+  let htmlStr = `<img src="${imageUrl.value}" alt=""/>`
+  if (headerImg.value) { 
+    htmlStr = `<img src="${imageUrl.value}" class="header-img" alt=""/>`
+  }
+  html.value.push({ id: html.value.length, html: htmlStr, children: [], attributes: "", editing: true, hover: false }); 
   showModal.value = false; 
 }
 
