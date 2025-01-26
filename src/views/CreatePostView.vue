@@ -75,7 +75,7 @@ import NavComponent from '../components/nav.vue';
 import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
 import Modal from '../components/modal.vue';
-import { currentUser } from '../utils/auth'
+import { currentUser } from '../utils/auth'; 
 import ExisitingImages from '../components/exisitingImages.vue';
 import UploadingImage from '../components/uploadingImage.vue';
 
