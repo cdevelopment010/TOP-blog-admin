@@ -12,12 +12,13 @@
 
         <button type="submit">Login</button>
     </form>
+    <button class="btn" @click="resetPassword">Reset Password</button>
 
     <p v-if="errorMessage" class="error">{{ errorMessage  }}</p>
 
-    <div>
+    <!-- <div>
         <RouterLink to="/sign-up">Create Account</RouterLink>
-    </div>
+    </div> -->
 </template>
 
 <script setup lang="ts">
@@ -31,6 +32,17 @@ const router = useRouter();
 const email = ref('');
 const password = ref(''); 
 const errorMessage = ref(''); 
+
+const resetPassword = async () => {
+    if (email.value == "" || !email.value) {
+        throw new Error("Missing email.")
+    }
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email.value, {
+        redirectTo: "http://localhost:5173/reset-password"
+        // redirectTo: "https://admin.coffeeshopcoding.dev/reset-password"
+    })
+}
 
 const handleSubmit = async () => {
     try { 
