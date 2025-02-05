@@ -32,6 +32,7 @@
                 <li @click.stop="addSection('ad')">Ad</li>
                 <li @click.stop="addSection('affiliate')">Affiliate Warning</li>
                 <li @click.stop="addSection('tags')">Tags</li>
+                <li @click.stop="addSection('bulletpoints')">Bullet Points</li>
               </ul>
             </div>
           </button>
@@ -311,6 +312,17 @@ function addSection(type: string) {
 
     html.value.push({ id: html.value.length, html: `<pre><code>code</code></pre>`, children: [], attributes: "", editing: true, hover: false })
   }
+  if (type == 'bulletpoints') { 
+    html.value.push({
+      id: html.value.length,
+      html: "",
+      children: [],
+      attributes: "bulletpoints",
+      editing: true,
+      hover: false
+    });
+  }
+
   if (type == 'ad') {
     console.error("Adding ads isn't supported yet")
       const adHtml = `<div align="center" class="ads"></div>`;

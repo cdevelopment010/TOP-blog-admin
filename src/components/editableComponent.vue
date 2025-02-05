@@ -21,7 +21,13 @@
     </div>
   </div>
   <div class="content">
-    <div ref="editable" class="editable" :contenteditable="props.data.editing" v-html="editableText.value" role="document"
+    <BulletList 
+      v-if="props.data.attributes == 'bulletpoints'"
+      :data="JSON.parse(data.html || '[]')"
+      @update="updateBulletPoints"
+    />
+
+    <div v-else ref="editable" class="editable" :contenteditable="props.data.editing" v-html="editableText.value" role="document"
       aria-multiline="true" aria-selected="true" @focus="isEditing = true;"
       @blur="(e) => { handleBlur(); updateContent(e) }" @mouseup="checkSelection" style="white-space: pre-wrap;min-width: 1px;">
     </div>
@@ -30,6 +36,7 @@
 
 <script setup lang="ts">
 import { defineEmits, reactive, ref, watch } from "vue";
+import BulletList from "./bulletList.vue";
 
 // Define the interface for the element
 interface element {
@@ -87,6 +94,10 @@ function preserveSelection() {
     selection.removeAllRanges();
     selection.addRange(selectionRange.value);
   }
+}
+
+function updateBulletPoints(updatedList: string[]) { 
+  console.log(JSON.stringify(updatedList))
 }
 
 function deleteSection() { 
