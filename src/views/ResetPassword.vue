@@ -34,19 +34,19 @@ const handleSubmit = async() => {
     try { 
         const { data, error } = await supabase.auth.updateUser({ 
             password: newPassword.value
-        }); 
+        });     
 
         if (error) { 
             console.error("Error resetting password:", error.message);
             return;
         }
-        console.log("currentUser", currentUser.value)
 
+        // const response = await fetch('http://localhost:3000/user/updatePassword', {
         const response = await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/user/updatePassword', {
             method: 'PUT', 
             mode: 'cors',
             headers: { 'Content-Type': 'application/json'}, 
-            body: JSON.stringify({ currentUser: currentUser, newPassword: newPassword.value })
+            body: JSON.stringify({ currentUserEmail: data.user.email, newPassword: newPassword.value, confirmPassword: confirmPassword.value })
         })
         
         if (!response.ok) { throw new Error('Failed to log in')}
