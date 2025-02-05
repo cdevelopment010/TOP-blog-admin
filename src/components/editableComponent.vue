@@ -13,6 +13,7 @@
         <span @click="addLink" class="pointer me-2">
           <i class="fa-solid fa-link"></i>
         </span>
+        <span @click="highlightText" class="pointer me-2">Highlight</span>
       </div>
       <div class="toolbar-border toolbar-item"> 
         <span @click="deleteSection"><i class="fa-solid fa-trash"></i></span>
@@ -107,6 +108,14 @@ function applyStyle(style: string): void {
   selectionRange.value.insertNode(span);
 
   resetSelection();
+}
+
+function highlightText() { 
+  if (!selectionRange.value) { return }
+  const span = document.createElement("span"); 
+  span.classList.add('highlight');
+  span.appendChild(selectionRange.value.extractContents()); 
+  selectionRange.value.insertNode(span); 
 }
 
 function addLink() {
