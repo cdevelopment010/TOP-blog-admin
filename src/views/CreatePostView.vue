@@ -66,6 +66,8 @@
             </div>
         </template>
     </Modal>
+
+    <Toast />
 </template>
 
 
@@ -79,9 +81,11 @@ import Modal from '../components/modal.vue';
 import { currentUser } from '../utils/auth'; 
 import ExisitingImages from '../components/exisitingImages.vue';
 import UploadingImage from '../components/uploadingImage.vue';
-
+import { useToast } from '../utils/useToast';
+import Toasts from '../components/Toasts.vue';
 
 const route = useRoute();
+const { addToast } = useToast(); 
 
 declare global {
   interface Window {
@@ -245,10 +249,12 @@ async function save(updatedPostSettings: PostSettings) {
         .then(async response => {
             if(!response.ok) {
                 const data = await response.json(); 
+                addToast({ title: 'Error!', message: 'There was an error saving the post.', type: 'danger', timeout: 3000})
                 throw new Error(data.message)
             } else { 
               const data = response.json(); 
               console.log("success", data); 
+              addToast({ title: 'Success', message: 'Post was saved', type: 'success', timeout: 3000})
             }
         })
         .catch(err => {
