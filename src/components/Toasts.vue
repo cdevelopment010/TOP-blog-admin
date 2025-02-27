@@ -1,9 +1,11 @@
 <template>
     <div class="toast-container">
-        <div v-for="toast in toasts" :key="toast.id" class="toast" :class="toast.type">
-            <h4 v-if="toast.title">{{ toast.title }}</h4>
+        <div v-for="toast in toasts" :key="toast.id" class="toast d-flex flex-column" :class="toast.type">
+            <div class="toast-header d-flex align-items-center justify-content-between">
+              <h4 v-if="toast.title" class="m-0">{{ toast.title }}</h4>
+              <button @click="removeToast(toast.id)" class="m-0">X</button>
+            </div>
             <p>{{ toast.message }}</p>
-            <button @click="removeToast(toast.id)">X</button>
         </div>
     </div>
 
@@ -20,8 +22,8 @@ const { toasts, removeToast} = useToast();
 <style scoped>
 .toast-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  top: 20px;
+  left: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -35,9 +37,10 @@ const { toasts, removeToast} = useToast();
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  /* align-items: center; */
   min-width: 250px;
   transition: opacity 0.3s ease-in-out;
+  position: relative;
 }
 
 .toast.success { background: #4CAF50; }
@@ -45,11 +48,20 @@ const { toasts, removeToast} = useToast();
 .toast.danger { background: #F44336; }
 .toast.info { background: #2196F3; }
 
+h4 { 
+  padding: 0; 
+  margin: 0;
+}
 button {
+  position: absolute; 
+  top: 8px; 
+  right: 12px; 
   background: none;
   border: none;
   color: white;
   font-size: 16px;
   cursor: pointer;
+  margin: 0; 
+  padding: 0;
 }
 </style>

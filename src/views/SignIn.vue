@@ -19,6 +19,8 @@
     <!-- <div>
         <RouterLink to="/sign-up">Create Account</RouterLink>
     </div> -->
+
+    <Toasts />
 </template>
 
 <script setup lang="ts">
@@ -26,8 +28,11 @@ import { RouterLink, useRouter } from 'vue-router';
 import { ref  } from 'vue';
 import { currentUser } from '../utils/auth'
 import { supabase } from '../utils/supabase';
+import Toasts from '../components/Toasts.vue';
+import { useToast } from '../utils/useToast';
 
 const router = useRouter(); 
+const { addToast } = useToast(); 
 
 const email = ref('');
 const password = ref(''); 
@@ -39,8 +44,8 @@ const resetPassword = async () => {
     }
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(email.value, {
-        redirectTo: "http://localhost:5173/reset-password"
-        // redirectTo: "https://admin.coffeeshopcoding.dev/reset-password"
+        // redirectTo: "http://localhost:5173/reset-password"
+        redirectTo: "https://admin.coffeeshopcoding.dev/reset-password"
     })
 }
 
@@ -52,6 +57,7 @@ const handleSubmit = async () => {
         })
 
         if (error) {
+            addToast({title: "Error!", message: "Unable to login. Please try again.", type: "danger", timeout: 3000});  
             throw new Error(error.message);
         }
         console.log("Log in!", data);
