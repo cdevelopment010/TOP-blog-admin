@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
     //     // console.log("HERE", from);
     //     next({ name: 'sign-in'}); 
     // } else {
-    //     next(); 
+        next(); 
     // }
 })
 
