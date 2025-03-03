@@ -1,5 +1,5 @@
 import { jwtDecode }  from 'jwt-decode'
-import { ref } from "vue"; 
+import { ref, onMounted } from "vue"; 
 import { supabase } from './supabase';
 
 
@@ -19,18 +19,19 @@ supabase.auth.onAuthStateChange((event, session) => {
     if (session?.access_token) {
         // Save token to localStorage after successful login
         localStorage.setItem('jwt', session.access_token);
-    } else { 
-        supabase.auth.getSession().then(({ data }) => {
-            console.log('Session after redirect:', data);
-            if (data.session?.access_token) {
-                localStorage.setItem('jwt', data.session.access_token);
-            }
-        });
-    }
+    } 
+    // else { 
+    //     supabase.auth.getSession().then(({ data }) => {
+    //         console.log('Session after redirect:', data);
+    //         if (data.session?.access_token) {
+    //             localStorage.setItem('jwt', data.session.access_token);
+    //         }
+    //     });
+    // }
 });
 
 export function isAuthenticated(): boolean { 
-    
+
     console.log(localStorage.getItem('jwt')); 
 
     const token = localStorage.getItem('jwt'); 
@@ -45,3 +46,13 @@ export function isAuthenticated(): boolean {
         return false; 
     }
 }
+
+onMounted(() => {
+    // After page reload, check for session
+    supabase.auth.getSession().then(({ data }) => {
+        console.log('Session after redirect:', data);
+        if (data.session?.access_token) {
+            localStorage.setItem('jwt', data.session.access_token);
+        }
+    });
+});
