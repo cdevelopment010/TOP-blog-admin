@@ -13,30 +13,7 @@
         <button type="submit">Login</button>
     </form>
 
-
-    <!-- <div
-        id="g_id_onload"
-        data-client_id="182128599079-tc9jp5huhpuk1vt564r5084iuj9gtu00.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleSignInWithGoogle"
-        data-nonce=""
-        data-auto_select="true"
-        data-itp_support="true"
-        data-use_fedcm_for_prompt="true"
-        ></div>
-
-        <div
-        class="g_id_signin"
-        data-type="standard"
-        data-shape="pill"
-        data-theme="outline"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left"
-        ></div> -->
-
-    <button @click="signInWithGoogle">Sign in with Google</button>
+    <!-- <button @click="signInWithGoogle">Sign in with Google</button> -->
 
     <button class="btn" @click="resetPassword">Reset Password</button>
 
@@ -46,7 +23,7 @@
         <RouterLink to="/sign-up">Create Account</RouterLink>
     </div> -->
 
-    <button @click="signOut">Sign Out</button>
+    <!-- <button @click="signOut">Sign Out</button> -->
 
     <Toasts />
 </template>
@@ -77,37 +54,21 @@ const resetPassword = async () => {
     })
 }
 
-// async function handleSignInWithGoogle(response :any) {
-//     console.log("Response", response);
-//     const { data, error } = await supabase.auth.signInWithIdToken({
+// const signInWithGoogle = async () => {
+//     // debugger;
+//     const redirectUrl = window.location.origin; 
+//     console.log(redirectUrl)
+//     const { data, error } = await supabase.auth.signInWithOAuth({
 //         provider: 'google',
-//         token: response.credential,
-//     }); 
+//         options: {
+//             redirectTo: redirectUrl
+//         }
+//     });
+// };
 
-//     if (error) {
-//         console.error("Supabase login error:", error);
-//         addToast({ title: "Error!", message: error.message, type: "danger", timeout: 3000 });
-//     } else {
-//         console.log("Supabase login success:", data);
-//         router.push("/"); // Redirect to home after login
-//     }
-// }
-
-const signInWithGoogle = async () => {
-    // debugger;
-    const redirectUrl = window.location.origin; 
-    console.log(redirectUrl)
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: redirectUrl
-        }
-    });
-};
-
-const signOut = async () => {
-    await supabase.auth.signOut(); 
-} 
+// const signOut = async () => {
+//     await supabase.auth.signOut(); 
+// } 
 
 
 

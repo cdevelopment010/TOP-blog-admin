@@ -26,10 +26,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    console.log("to.meta.requiresAuth",to.meta.requiresAuth)
-    console.log("!isAuthenticated()",!isAuthenticated())
+    // console.log("to.meta.requiresAuth",to.meta.requiresAuth)
+    // console.log("!isAuthenticated()",!isAuthenticated())
     if (to.meta.requiresAuth && !isAuthenticated() ) {
-    //     // console.log("HERE", from);
         next({ name: 'sign-in'}); 
     } else {
         next(); 

@@ -105,12 +105,19 @@ button:focus-visible {
 }
 
 .d-flex { display: flex; }
+.flex-wrap { flex-wrap: wrap;}
 .flex-column { flex-direction: column;}
 .align-items-center{align-items: center;}
 .justify-content-evenly { justify-content: space-evenly;}
 .justify-content-center {justify-content: center;}
 .justify-content-between {justify-content: space-between;}
 .flex-start {align-self: flex-start;}
+.align-self-end { align-self: flex-end;}
+.justify-self-end { justify-self: end;}
+
+.last-item { margin-top: auto}
+.gap-1 { gap: 0.5rem;}
+.gap-2 { gap: 1rem;}
 
 
 .mx-auto {margin-inline: auto;}
@@ -193,4 +200,5 @@ button:focus-visible {
     align-items: center;
     justify-content: flex-start;
   }
+
 }

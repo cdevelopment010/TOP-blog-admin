@@ -14,7 +14,7 @@ interface User {
 export const currentUser = ref<User|null>(null);
 
 supabase.auth.onAuthStateChange((event, session) => {
-    console.log("Auth state changed:", event, session);
+    // console.log("Auth state changed:", event, session);
 
     if (session?.access_token) {
         console.log("Saving token to localStorage...");
@@ -27,7 +27,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 export function isAuthenticated(): boolean { 
 
-    console.log(localStorage.getItem('jwt')); 
+    // console.log(localStorage.getItem('jwt')); 
 
     const token = localStorage.getItem('jwt'); 
     // if (token == undefined) { return true} //Issue with Google auth, doesn't set it straight away so always redirects to sign in
@@ -44,7 +44,7 @@ export function isAuthenticated(): boolean {
 }
 
 onMounted(async () => {
-    console.log("Checking session on mount...");
+    // console.log("Checking session on mount...");
     const { data } = await supabase.auth.getSession();
 
     if (data.session?.access_token) {

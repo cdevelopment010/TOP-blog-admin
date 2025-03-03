@@ -1,5 +1,5 @@
 <template>
-    <nav>
+    <nav class="gap-2 flex-wrap">
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/posts">Posts</RouterLink>
         <RouterLink to="/tags">Tags</RouterLink>
@@ -10,6 +10,10 @@
                 <span v-if="theme=='light'"><i class="fa-solid fa-moon"></i></span>
             </button>
         </div>
+
+        <div class="last-item">
+            <button @click="signOut" class="btn">Sign out</button>
+        </div>
     </nav>
 
 </template>
@@ -17,6 +21,7 @@
 <script setup lang="ts">
     import { RouterLink } from 'vue-router';
     import { onMounted, ref } from "vue";
+    import { supabase } from '../utils/supabase';
 
     const theme = ref<string>("dark"); 
 
@@ -24,6 +29,10 @@
         theme.value = theme.value == 'dark' ? 'light' : 'dark';
         document.body.className = theme.value; 
         localStorage.setItem('theme-selector', theme.value);
+    }
+
+    const signOut = async () => {
+        await supabase.auth.signOut(); 
     }
 
 
