@@ -35,6 +35,7 @@ export function isAuthenticated(): boolean {
     console.log(localStorage.getItem('jwt')); 
 
     const token = localStorage.getItem('jwt'); 
+    if (token == undefined) { return true} //Issue with Google auth, doesn't set it straight away so always redirects to sign in
     if (!token) { return false;}
 
     try { 
