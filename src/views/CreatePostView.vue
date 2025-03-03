@@ -6,37 +6,44 @@
     <div class="body-container post-grid">
       <!-- Main section -->
       <div class="create-post-section">
-        <template v-for="(el, index) in html" :key="el.id">
-          <editableComponent :data="el" 
-            @update="updateHtml(index, $event)" 
-            @setDeleted="deleteSection"
-            @moveUp="moveUp(index)"
-            @moveDown="moveDown(index)"
-            />
-        </template>
-        <div class="add-section-container">
-          <button @click.stop="togglePopup" class="add-section">
-            <i class="fa-solid fa-circle-plus fa-2x"></i>
+        <div class="editor">
+          <div class="toolbar">
+            <button @click="applyFormatting('bold')">Bold</button>
+            <button @click="applyFormatting('italic')">Italic</button>
+            <button @click="applyFormatting('highlight')">Highlight</button>
+            <input v-model="linkInput" placeholder="Enter link URL" />
+            <button @click="applyFormatting('link')">Add Link</button>
+          </div>
 
-            <!-- popup for add section -->
-            <!-- Maybe move to component -->
-            <div v-if="showPopup" class="popup-menu" ref="popupMenu">
-              <ul>
-                <li @click.stop="addSection('h2')">H2</li>
-                <li @click.stop="addSection('h2')">H3</li>
-                <li @click.stop="addSection('h3')">H4</li>
-                <li @click.stop="addSection('p')">Paragraph</li>
-                <li @click.stop="addSection('img')">Image</li>
-                <li @click.stop="addSection('header-img')">Header Image</li>
-                <li @click.stop="addSection('code')">Code Block</li>
-                <li @click.stop="addSection('ad')">Ad</li>
-                <li @click.stop="addSection('affiliate')">Affiliate Warning</li>
-                <li @click.stop="addSection('tags')">Tags</li>
-              </ul>
-            </div>
-          </button>
-
+          <button @click="addBlock('paragraph')">Add Paragraph</button>
+          <button @click="addBlock('header')">Add Header</button>
+          <button @click="addBlock('quote')">Add Quote</button>
+          <button @click="addBlock('code')">Add Code</button>
+          <button @click="saveDocument">Save</button>
+          <!-- <button @click="loadDocument">Load</button> -->
         </div>
+
+        <div v-for="(block, index) in documentModel" :key="block.id" >
+
+          <button @click="moveUp(block.id)">Up</button>
+          <button @click="moveDown(block.id)">Down</button>
+          <h2 @click="selectBlock(block.id)" v-if="block.type === 'header'" contenteditable @input="updateContent(block.id,($event.target as HTMLElement).innerText)">
+            {{ block.content }}
+          </h2>
+          <p @click="selectBlock(block.id)" v-else-if="block.type === 'paragraph'" 
+            contenteditable 
+            @input="updateContent(block.id, ($event.target as HTMLElement).innerText)"
+            v-html="parseFormattedText(block.content)">
+          </p>
+          <blockquote @click="selectBlock(block.id)" v-else-if="block.type === 'quote'" contenteditable @input="updateContent(block.id, ($event.target as HTMLElement).innerText)">
+            {{ block.content }}
+          </blockquote>
+          <pre @click="selectBlock(block.id)" v-else-if="block.type === 'code'"><code contenteditable @input="updateContent(block.id, ($event.target as HTMLElement).innerText)">{{ block.content }}</code></pre>
+          <a @click="selectBlock(block.id)" v-else-if="block.type === 'link'" :href="block.url" target="_blank">
+            {{ block.content }}
+          </a>
+        </div>
+
 
       </div>
 
@@ -72,17 +79,17 @@
 
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import NavComponent from '../components/nav.vue';
-import editableComponent from '../components/editableComponent.vue';
+// import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
 import Modal from '../components/modal.vue';
 import { currentUser } from '../utils/auth'; 
 import ExisitingImages from '../components/exisitingImages.vue';
 import UploadingImage from '../components/uploadingImage.vue';
 import { useToast } from '../utils/useToast';
-import Toasts from '../components/Toasts.vue';
+// import Toasts from '../components/Toasts.vue';
 
 const route = useRoute();
 const { addToast } = useToast(); 
@@ -93,7 +100,6 @@ declare global {
   }
 }
 
-const adsbygoogle = window.adsbygoogle || [];
 
 type JsonValue = 
   | string
@@ -104,13 +110,13 @@ type JsonValue =
   | JsonValue[];
 
 interface element {
-  id: number,
-  html: string,
-  children: element[]
-  attributes: string,
-  editing: boolean,
-  hover: boolean,
-  deleted?: boolean
+  id: number;
+  type: string;
+  level?: number;
+  content: string;
+  language?: string;
+  url?: string;
+  children?: element[];
 }
 
 interface PostSettings {
@@ -147,9 +153,15 @@ const headerImg = ref<boolean>(false);
 const createPost = ref<boolean>(true);
 const showPopup = ref<boolean>(false);
 const popupMenu = ref<HTMLElement | null>();
-const html = ref<element[]>([
-  { id: 0, html: "<h1>Awesome title!</h1>", children: [], attributes: "", editing: true, hover: false }
-])
+const documentModel = ref<element[]>([]); 
+const selectedBlock = ref<number | null>(null); 
+const toolbarAction = ref<number | null>(null);
+const linkInput = ref(""); 
+
+const saveDocument = () => {
+  console.log("document", documentModel.value)
+}
+
 const postSettings = ref<PostSettings>({
   id: null,
   slug: '',
@@ -157,37 +169,76 @@ const postSettings = ref<PostSettings>({
   tags: [],
   keywords: ''
 });
-watch(html, (newVal) => {
-}, { deep: true });
 
-let isDeleting = false;
+const updateContent = (id :number, newContent :string | null) => {
+  const block = documentModel.value.find(b => b.id == id);
+  if (block && newContent) {
+    block.content = newContent; 
+  }
+}
 
-function deleteSection(id: number) {
-  isDeleting = true; // Disable updateHtml temporarily
-  html.value = html.value.filter((section) => section.id !== id);
-  setTimeout(() => (isDeleting = false), 0); // Re-enable after deletion
+const addBlock = (type: string) => { 
+  documentModel.value.push({
+    id: documentModel.value.length, 
+    type, 
+    content: type === "code" ? "console.log('New code block');" : "New " + type
+  })
 }
-function updateHtml(index: number, updatedHtml: string) {
-  if (isDeleting || isMoving) return;
-  html.value[index] = { ...html.value[index], html: updatedHtml };  
-}
- function updatePostSettings(updatedPostSettings: PostSettings) {
+
+const applyFormatting = (action: string) => {
+  if (!selectedBlock.value) return;
+  
+  let block = documentModel.value.find(b => b.id === selectedBlock.value);
+  if (!block) return;
+
+  if (action === "bold") { document.execCommand(action); }
+  if (action === "italic") { document.execCommand(action); }
+  if (action === "highlight") block.content = `==${block.content}==`;
+  if (action === "link") {
+    block.type = "link";
+    block.url = linkInput.value || "https://";
+  }
+};
+
+const selectBlock = (id: number) => {
+  selectedBlock.value = id;
+};
+
+const parseFormattedText = (text : string | null) => {
+  if (!text) return "";
+
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")  // Bold
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")      // Italic
+    .replace(/==(.*?)==/g, "<mark>$1</mark>"); // Highlight
+};
+
+
+function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
   generateTags(); 
 }
 let isMoving = false; 
 function moveUp(index: number) { 
   isMoving = true; 
-  if (index <= 1) { return }
-  [html.value[index-1], html.value[index]] = [html.value[index], html.value[index-1]];
+  console.log(index, index-1)
+  if (index <= 0) { return }
+  [documentModel.value[index-1], documentModel.value[index]] = [documentModel.value[index], documentModel.value[index-1]];
+  const tempId = documentModel.value[index].id;
+  documentModel.value[index].id = documentModel.value[index - 1].id;
+  documentModel.value[index - 1].id = tempId;
   setTimeout(() => {isMoving = false}, 0);
 
 }
 
 function moveDown(index: number) { 
   isMoving = true; 
-  if (index >= html.value.length) { return }
-  [html.value[index], html.value[index+1]] = [html.value[index+1], html.value[index]];
+  console.log(index, index+1)
+  if (index >= documentModel.value.length - 1) { return }
+  [documentModel.value[index], documentModel.value[index+1]] = [documentModel.value[index+1], documentModel.value[index]];
+  const tempId = documentModel.value[index].id;
+  documentModel.value[index].id = documentModel.value[index + 1].id;
+  documentModel.value[index + 1].id = tempId;
   setTimeout(() => {isMoving = false}, 0);
 
 }
@@ -212,7 +263,7 @@ async function getPostById() {
             } else { 
               const data = await response.json(); 
               console.log("update post:",data.data.content)
-              html.value = JSON.parse(data.data.content);
+              documentModel.value = JSON.parse(data.data.content);
 
               postSettings.value.description = data.data.metaDescription;
               postSettings.value.keywords = data.data.metaKeywords; 
@@ -286,69 +337,62 @@ function generateTags() : void {
   }
 }
 
-function addSection(type: string) {
-  if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
-    html.value.push({ id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false })
-  }
-  if (type == 'img') {
-    headerImg.value = false;
-    showModal.value = true; 
-  }
-  if (type == 'header-img') {
-    headerImg.value = true;
-    showModal.value = true; 
-  }
-  if (type == 'affiliate') {
-    html.value.push({id: html.value.length, html: `<section><i>Disclosure: This post may contain affiliate links, meaning I get a commission if you decide to make a purchase through my links, at no cost to you.</i></section>`, children: [], attributes: "", editing: false, hover: false})
-  }
+// function addSection(type: string) {
+//   if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
+//     html.value.push({ id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false })
+//   }
+//   if (type == 'img') {
+//     headerImg.value = false;
+//     showModal.value = true; 
+//   }
+//   if (type == 'header-img') {
+//     headerImg.value = true;
+//     showModal.value = true; 
+//   }
+//   if (type == 'affiliate') {
+//     html.value.push({id: html.value.length, html: `<section><i>Disclosure: This post may contain affiliate links, meaning I get a commission if you decide to make a purchase through my links, at no cost to you.</i></section>`, children: [], attributes: "", editing: false, hover: false})
+//   }
 
-  if (type == 'tags') {
-    html.value.push({ id: html.value.length, html: `<section id='tag-section' class='d-flex align-items-center justify-content-center'></section>`, children: [], attributes: "", editing: false, hover: false })
-    setTimeout(() => {
-      generateTags();
-    }, 250);  
-  }
-  if (type == 'code') {
-    let lang = prompt("Which language is the code?"); 
-    if (!lang) {
-      console.error("No language added"); 
-      return; 
-    }
+//   if (type == 'tags') {
+//     html.value.push({ id: html.value.length, html: `<section id='tag-section' class='d-flex align-items-center justify-content-center'></section>`, children: [], attributes: "", editing: false, hover: false })
+//     setTimeout(() => {
+//       generateTags();
+//     }, 250);  
+//   }
+//   if (type == 'code') {
+//     let lang = prompt("Which language is the code?"); 
+//     if (!lang) {
+//       console.error("No language added"); 
+//       return; 
+//     }
 
-    html.value.push({ id: html.value.length, html: `<pre><code>code</code></pre>`, children: [], attributes: "", editing: true, hover: false })
-  }
-  if (type == 'ad') {
-    console.error("Adding ads isn't supported yet")
-      const adHtml = `<div align="center" class="ads"></div>`;
-    html.value.push({
-      id: html.value.length,
-      html: adHtml,
-      children: [],
-      attributes: "",
-      editing: false,
-      hover: false
-    });
-  }
-  showPopup.value = false;
-}
-function togglePopup() {
-  showPopup.value = !showPopup.value;
-}
-
-/*
-  - Drag sections
-  - Highlight for popup menu
-    - underline
-  - delete sections
-*/
+//     html.value.push({ id: html.value.length, html: `<pre><code>code</code></pre>`, children: [], attributes: "", editing: true, hover: false })
+//   }
+//   if (type == 'ad') {
+//     console.error("Adding ads isn't supported yet")
+//       const adHtml = `<div align="center" class="ads"></div>`;
+//     html.value.push({
+//       id: html.value.length,
+//       html: adHtml,
+//       children: [],
+//       attributes: "",
+//       editing: false,
+//       hover: false
+//     });
+//   }
+//   showPopup.value = false;
+// }
+// function togglePopup() {
+//   showPopup.value = !showPopup.value;
+// }
 
 function setupPost(): Post {
   const titleDom = new DOMParser(); 
-  const title = titleDom.parseFromString(html.value[0].html, "text/html").body.textContent;
+  const title = titleDom.parseFromString(documentModel.value[0].content, "text/html").body.textContent;
 
   const post: Post = { 
     title: title,
-    content: JSON.stringify(html.value),
+    content: JSON.stringify(documentModel.value),
     numberOfView: 0,
     numberOfShares: 0,
     published: false,
@@ -380,7 +424,7 @@ function submitImage(): void {
   if (headerImg.value) { 
     htmlStr = `<img src="${imageUrl.value}" class="header-img" alt=""/>`
   }
-  html.value.push({ id: html.value.length, html: htmlStr, children: [], attributes: "", editing: true, hover: false }); 
+  documentModel.value.push({ id: documentModel.value.length, content: htmlStr, type: 'image'}); 
   showModal.value = false; 
 }
 
@@ -416,6 +460,29 @@ onBeforeUnmount(() => {
 .add-section-container,
 .add-section {
   position: relative;
+}
+
+
+.editor {
+  max-width: 600px;
+  margin: auto;
+  font-family: sans-serif;
+}
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+button {
+  cursor: pointer;
+  padding: 5px;
+  margin: 3px;
+}
+[contenteditable] {
+  outline: none;
+  border: 1px solid lightgray;
+  padding: 4px;
+  margin: 4px 0;
 }
 
 
