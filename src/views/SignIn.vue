@@ -95,6 +95,8 @@ const resetPassword = async () => {
 
 const signInWithGoogle = async () => {
     // debugger;
+    console.log(window.location.origin);
+    debugger; 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
