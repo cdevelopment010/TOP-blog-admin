@@ -19,6 +19,13 @@ supabase.auth.onAuthStateChange((event, session) => {
     if (session?.access_token) {
         // Save token to localStorage after successful login
         localStorage.setItem('jwt', session.access_token);
+    } else { 
+        supabase.auth.getSession().then(({ data }) => {
+            console.log('Session after redirect:', data);
+            if (data.session?.access_token) {
+                localStorage.setItem('jwt', data.session.access_token);
+            }
+        });
     }
 });
 
