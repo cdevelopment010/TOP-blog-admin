@@ -15,19 +15,14 @@ export const currentUser = ref<User|null>(null);
 
 supabase.auth.onAuthStateChange((event, session) => {
     console.log("Auth state changed:", event, session);
-    
+
     if (session?.access_token) {
-        // Save token to localStorage after successful login
-        localStorage.setItem('jwt', session.access_token);
-    } 
-    // else { 
-    //     supabase.auth.getSession().then(({ data }) => {
-    //         console.log('Session after redirect:', data);
-    //         if (data.session?.access_token) {
-    //             localStorage.setItem('jwt', data.session.access_token);
-    //         }
-    //     });
-    // }
+        console.log("Saving token to localStorage...");
+        localStorage.setItem("jwt", session.access_token);
+    } else {
+        console.log("No session found, clearing storage.");
+        localStorage.removeItem("jwt");
+    }
 });
 
 export function isAuthenticated(): boolean { 
@@ -48,12 +43,14 @@ export function isAuthenticated(): boolean {
     }
 }
 
-onMounted(() => {
-    // After page reload, check for session
-    supabase.auth.getSession().then(({ data }) => {
-        console.log('Session after redirect:', data);
-        if (data.session?.access_token) {
-            localStorage.setItem('jwt', data.session.access_token);
-        }
-    });
+onMounted(async () => {
+    console.log("Checking session on mount...");
+    const { data } = await supabase.auth.getSession();
+
+    if (data.session?.access_token) {
+        console.log("Session found on mount:", data);
+        localStorage.setItem("jwt", data.session.access_token);
+    } else {
+        console.log("No session found on mount.");
+    }
 });
