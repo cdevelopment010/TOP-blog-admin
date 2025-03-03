@@ -92,24 +92,13 @@ const resetPassword = async () => {
 // }
 
 const signInWithGoogle = async () => {
-    debugger;
+    // debugger;
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: 'https://syukwgbfweshgnfgcorp.supabase.co/auth/v1/callback', 
-            // flow: 'implicit'
+            redirectTo: window.location.origin//'https://syukwgbfweshgnfgcorp.supabase.co/auth/v1/callback', 
         }
     });
-
-    console.log("Google sign-in response:", data);
-
-    if (error) {
-        addToast({ title: "Error!", message: error.message, type: "danger", timeout: 3000 });
-        console.error("Google Sign-In Error:", error);
-    } else {
-        console.log("Google Sign-In Success:", data);   
-        router.push("/")
-    }   
 };
 
 
