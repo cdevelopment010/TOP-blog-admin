@@ -46,6 +46,8 @@
         <RouterLink to="/sign-up">Create Account</RouterLink>
     </div> -->
 
+    <button @click="signOut">Sign Out</button>
+
     <Toasts />
 </template>
 
@@ -100,6 +102,10 @@ const signInWithGoogle = async () => {
         }
     });
 };
+
+const signOut = async () => {
+    await supabase.auth.signOut(); 
+} 
 
 
 

@@ -14,7 +14,7 @@ interface User {
 export const currentUser = ref<User|null>(null);
 
 supabase.auth.onAuthStateChange((event, session) => {
-    // console.log("Auth state changed:", event, session);
+    console.log("Auth state changed:", event, session);
     
     if (session?.access_token) {
         // Save token to localStorage after successful login
