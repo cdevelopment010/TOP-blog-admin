@@ -95,12 +95,12 @@ const resetPassword = async () => {
 
 const signInWithGoogle = async () => {
     // debugger;
-    console.log(window.location.origin);
-    debugger; 
+    const redirectUrl = window.location.origin; 
+    console.log(redirectUrl)
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin//'https://syukwgbfweshgnfgcorp.supabase.co/auth/v1/callback', 
+            redirectTo: redirectUrl
         }
     });
 };

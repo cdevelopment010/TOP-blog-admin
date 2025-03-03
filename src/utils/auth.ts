@@ -30,6 +30,8 @@ supabase.auth.onAuthStateChange((event, session) => {
 });
 
 export function isAuthenticated(): boolean { 
+    
+    console.log(localStorage.getItem('jwt')); 
 
     const token = localStorage.getItem('jwt'); 
     if (!token) { return false;}
