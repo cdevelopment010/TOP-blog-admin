@@ -6,42 +6,65 @@
     <div class="body-container post-grid">
       <!-- Main section -->
       <div class="create-post-section">
-        <div class="editor">
-          <div class="toolbar">
-            <button @click="applyFormatting('bold')">Bold</button>
-            <button @click="applyFormatting('italic')">Italic</button>
-            <button @click="applyFormatting('highlight')">Highlight</button>
-            <input v-model="linkInput" placeholder="Enter link URL" />
-            <button @click="applyFormatting('link')">Add Link</button>
-          </div>
-
-          <button @click="addBlock('paragraph')">Add Paragraph</button>
-          <button @click="addBlock('header')">Add Header</button>
-          <button @click="addBlock('quote')">Add Quote</button>
-          <button @click="addBlock('code')">Add Code</button>
-          <button @click="saveDocument">Save</button>
-          <!-- <button @click="loadDocument">Load</button> -->
-        </div>
-
+        
+        <AddElement v-if="documentModel.length == 0"  @add-block="addBlock" @save-document="saveDocument" @show-add-element="showAddElement = !showAddElement"/>
         <div v-for="(block, index) in documentModel" :key="block.id" >
-
-          <button @click="moveUp(block.id)">Up</button>
-          <button @click="moveDown(block.id)">Down</button>
-          <h2 @click="selectBlock(block.id)" v-if="block.type === 'header'" contenteditable @input="updateContent(block.id,($event.target as HTMLElement).innerText)">
-            {{ block.content }}
+          <div v-if="showToolbar && selectedBlock == block.id" class="d-flex">
+            <button @click="moveUp(block.id)">Up</button>
+            <button @click="moveDown(block.id)">Down</button>
+            <toolbar  @apply-formatting="applyFormatting"/>
+          </div>
+          <h2 @click="selectBlock(block.id)" 
+              @focus="storeSelection"
+              v-if="block.type === 'header'" 
+              contenteditable 
+              @blur="updateContent(block.id)"
+              v-html="block.content"
+              :data-id="block.id">
           </h2>
-          <p @click="selectBlock(block.id)" v-else-if="block.type === 'paragraph'" 
+
+
+          <p @click="selectBlock(block.id)" 
+            @focus="() => {storeSelection(); showToolbar = true;}"
+            v-else-if="block.type === 'paragraph'"
             contenteditable 
-            @input="updateContent(block.id, ($event.target as HTMLElement).innerText)"
-            v-html="parseFormattedText(block.content)">
+            @blur="(e) => { handleBlur(); updateContent(block.id) }"
+            v-html="block.content"
+            :data-id="block.id">
           </p>
-          <blockquote @click="selectBlock(block.id)" v-else-if="block.type === 'quote'" contenteditable @input="updateContent(block.id, ($event.target as HTMLElement).innerText)">
-            {{ block.content }}
+
+          <blockquote 
+            @click="selectBlock(block.id)" 
+            @focus="storeSelection"
+            v-else-if="block.type === 'quote'" 
+            contenteditable 
+            @blur="updateContent(block.id)"
+            v-html="block.content"
+            >
           </blockquote>
-          <pre @click="selectBlock(block.id)" v-else-if="block.type === 'code'"><code contenteditable @input="updateContent(block.id, ($event.target as HTMLElement).innerText)">{{ block.content }}</code></pre>
-          <a @click="selectBlock(block.id)" v-else-if="block.type === 'link'" :href="block.url" target="_blank">
-            {{ block.content }}
+
+          <pre 
+            @click="selectBlock(block.id)" 
+            v-else-if="block.type === 'code'"
+            >
+            <code contenteditable 
+              @input="updateContent(block.id)"
+              @focus="storeSelection"
+              >
+              {{ block.content }}
+              </code>
+          </pre>
+          <a 
+            @click="selectBlock(block.id)" 
+            @focus="storeSelection"
+            v-else-if="block.type === 'link'" 
+            :href="block.url"
+            target="_blank"
+            v-html="block.content"
+            >
           </a>
+
+          <AddElement v-if="showToolbar && selectedBlock == block.id" @add-block="addBlock" @save-document="saveDocument" @show-add-element="showAddElement = !showAddElement"/>
         </div>
 
 
@@ -74,7 +97,7 @@
         </template>
     </Modal>
 
-    <Toast />
+    <Toasts />
 </template>
 
 
@@ -82,14 +105,15 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import NavComponent from '../components/nav.vue';
-// import editableComponent from '../components/editableComponent.vue';
 import PostSettings from '../components/postSettings.vue';
 import Modal from '../components/modal.vue';
 import { currentUser } from '../utils/auth'; 
 import ExisitingImages from '../components/exisitingImages.vue';
 import UploadingImage from '../components/uploadingImage.vue';
 import { useToast } from '../utils/useToast';
-// import Toasts from '../components/Toasts.vue';
+import Toasts from '../components/Toasts.vue';
+import toolbar from '../components/toolbar.vue';
+import AddElement from '../components/addElement.vue';
 
 const route = useRoute();
 const { addToast } = useToast(); 
@@ -148,6 +172,8 @@ interface Post {
 }
 
 const showModal = ref(); 
+const showToolbar = ref<boolean>(false); 
+const showAddElement = ref<boolean>(false); 
 const imageUrl = ref<string | null>(); 
 const headerImg = ref<boolean>(false);
 const createPost = ref<boolean>(true);
@@ -157,6 +183,7 @@ const documentModel = ref<element[]>([]);
 const selectedBlock = ref<number | null>(null); 
 const toolbarAction = ref<number | null>(null);
 const linkInput = ref(""); 
+let lastSelection: Range | null = null;
 
 const saveDocument = () => {
   console.log("document", documentModel.value)
@@ -170,12 +197,39 @@ const postSettings = ref<PostSettings>({
   keywords: ''
 });
 
-const updateContent = (id :number, newContent :string | null) => {
-  const block = documentModel.value.find(b => b.id == id);
-  if (block && newContent) {
-    block.content = newContent; 
+const storeSelection = () => {
+  const selection = window.getSelection();
+  if (selection && selection.rangeCount > 0) {
+    lastSelection = selection.getRangeAt(0);
   }
+};
+
+const restoreSelection = () => {
+  console.log("lastSelection", lastSelection);
+  if (lastSelection) {
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(lastSelection);
+  }
+};
+
+const handleBlur = () => {
+  storeSelection(); 
+  setTimeout(() => {
+    if (!showAddElement.value) { 
+      showToolbar.value = false; 
+    }
+  }, 250)
 }
+const updateContent = (id: number) => {
+  const block = documentModel.value.find(b => b.id === id);
+  if (!block) return;
+
+  const element = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
+  if (element) {
+    block.content = element.innerHTML; // Preserve formatting properly
+  }
+};
 
 const addBlock = (type: string) => { 
   documentModel.value.push({
@@ -185,34 +239,46 @@ const addBlock = (type: string) => {
   })
 }
 
-const applyFormatting = (action: string) => {
-  if (!selectedBlock.value) return;
+const applyFormatting = (action: string, url?: string) => {
+  console.log(action, url); 
+  debugger; 
+  restoreSelection(); // Ensure the correct selection is active
+  if (selectedBlock.value == null || !lastSelection) return;
   
   let block = documentModel.value.find(b => b.id === selectedBlock.value);
   if (!block) return;
 
-  if (action === "bold") { document.execCommand(action); }
-  if (action === "italic") { document.execCommand(action); }
-  if (action === "highlight") block.content = `==${block.content}==`;
-  if (action === "link") {
-    block.type = "link";
-    block.url = linkInput.value || "https://";
+  const selectedText = lastSelection.toString();
+  if (!selectedText) return;
+
+  let formattedText = selectedText;
+
+  if (action === "bold") {
+    formattedText = `<b>${selectedText}</b>`;
+  } else if (action === "italic") {
+    formattedText = `<i>${selectedText}</i>`;
+  } else if (action === "highlight") {
+    formattedText = `<mark>${selectedText}</mark>`;
+  } else if (action === "link") {
+    formattedText = `<a href="${url}" target="_blank">${selectedText}</a>`;
+  }
+
+  // Replace the selected text with formatted text
+  lastSelection.deleteContents();
+  const newNode = document.createElement("span");
+  newNode.innerHTML = formattedText;
+  lastSelection.insertNode(newNode);
+
+  // ✅ Ensure `documentModel` gets updated with new formatted content
+  const element = document.querySelector(`[data-id="${block.id}"]`) as HTMLElement;
+  if (element) {
+    block.content = element.innerHTML;
   }
 };
 
 const selectBlock = (id: number) => {
   selectedBlock.value = id;
 };
-
-const parseFormattedText = (text : string | null) => {
-  if (!text) return "";
-
-  return text
-    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")  // Bold
-    .replace(/\*(.*?)\*/g, "<i>$1</i>")      // Italic
-    .replace(/==(.*?)==/g, "<mark>$1</mark>"); // Highlight
-};
-
 
 function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
