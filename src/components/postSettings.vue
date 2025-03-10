@@ -107,7 +107,9 @@ function deleteTag(index: number) {
 
 const refreshTags = async (): Promise<Tag[] | void> => {
     try {
-        const response = await fetch('https://top-blog-api-proud-thunder-6960.fly.dev/tag/', {
+        // const url = "http://localhost:3000/tag/"
+        const url = "https://top-blog-api-proud-thunder-6960.fly.dev/tag/"
+        const response = await fetch(url, {
             mode: 'cors',
             method: 'GET',
             headers: { 

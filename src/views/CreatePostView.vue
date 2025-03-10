@@ -58,6 +58,15 @@
               :data-id="block.id">
           </h4>
 
+          <div
+            @click="selectBlock(block.id)" 
+            v-else-if="block.type == 'tag'"
+            v-html="block.content"
+            :data-id="block.id"
+          > 
+
+          </div>
+
 
           <p @click="selectBlock(block.id)" 
             @focus="() => {storeSelection(); showToolbar = true;}"
@@ -286,6 +295,15 @@ const addBlock = (type: string) => {
     showModal.value = true; 
     return;
   }
+
+  if (type == 'tag') { 
+    documentModel.value.push({
+      id: documentModel.value.length, 
+      type, 
+      content: `<section id='tag-section' class='d-flex align-items-center justify-content-center'>Tags</section>`
+    })
+    return; 
+  }
   documentModel.value.push({
     id: documentModel.value.length, 
     type, 
@@ -399,13 +417,13 @@ async function save(updatedPostSettings: PostSettings) {
   const post = setupPost();
   // console.log(route.params.id ,createPost, post); 
   let url = 'https://top-blog-api-proud-thunder-6960.fly.dev/post/'; 
+  // let url = 'http://localhost:3000/post/'; 
   let method = 'POST'; 
   if (!createPost.value) {
     url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${route.params.id}`;
     // url = `http://localhost:3000/post/${route.params.id}`;
     method = 'PUT';
   }
-  // await fetch('http://localhost:3000/post/', {
   await fetch(url, {
             mode: 'cors',
             method: method,
@@ -481,13 +499,6 @@ function updateImageUrl(url : string | null) : void {
   imageUrl.value = url; 
   console.log("Image URL", imageUrl.value);
 }
-
-// const getImageUrl = (htmlString: string) => {
-//   const parser = new DOMParser();
-//   const doc = parser.parseFromString(htmlString, "text/html");
-//   const img = doc.querySelector("img");
-//   return img ? img.src : "";
-// };
 
 function submitImage(): void { 
   if (!imageUrl.value) { return; }

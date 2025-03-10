@@ -15,6 +15,7 @@
         <button @click="addBlock('code')" title="code block" class="d-flex align-items-center justify-content-center"><i class="fa-solid fa-code"></i></button>
         <button @click="addBlock('image')" title="image" class="d-flex align-items-center justify-content-center"><i class="fa-solid fa-image"></i></button>
         <button @click="addBlock('header-image')" title="Post header image" class="d-flex align-items-center justify-content-center"><i class="fa-solid fa-panorama"></i></button>
+        <button @click="addBlock('tag')" title="Tag section" class="d-flex align-items-center justify-content-center"><i class="fa-solid fa-tag"></i></button>
         <!-- <button @click="addBlock('list')" title="list"><i class="fa-solid fa-list"></i></button> -->
         <button @click="saveDocument" title="save" class="d-flex align-items-center justify-content-center"><i class="fa-solid fa-floppy-disk"></i></button>
     </div>
