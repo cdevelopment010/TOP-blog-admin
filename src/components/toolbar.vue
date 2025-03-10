@@ -1,10 +1,10 @@
 <template> 
-<div class="toolbar">
-    <button @click="applyFormatting('bold')">Bold</button>
-    <button @click="applyFormatting('italic')">Italic</button>
-    <button @click="applyFormatting('highlight')">Highlight</button>
-    <input v-model="linkInput" placeholder="Enter link URL" />
-    <button @click="applyFormatting('link')">Add Link</button>
+<div class="m-0">
+    <span class="pointer me-2" @click="applyFormatting('bold')" ><b>B</b></span>
+    <span class="pointer me-2" @click="applyFormatting('italic')"><i>I</i></span>
+    <span class="pointer me-2" @click="applyFormatting('highlight')">Highlight</span>
+    <input class=" me-2" v-model="linkInput" placeholder="Enter link URL" />
+    <span class="pointer me-2" @click="applyFormatting('link')">Add Link</span>
 </div>
 
 </template>

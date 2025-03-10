@@ -9,19 +9,54 @@
         
         <AddElement v-if="documentModel.length == 0"  @add-block="addBlock" @save-document="saveDocument" @show-add-element="showAddElement = !showAddElement"/>
         <div v-for="(block, index) in documentModel" :key="block.id" >
-          <div v-if="showToolbar && selectedBlock == block.id" class="d-flex">
-            <button @click="moveUp(block.id)">Up</button>
-            <button @click="moveDown(block.id)">Down</button>
-            <toolbar  @apply-formatting="applyFormatting"/>
+          <div v-if="showToolbar && selectedBlock == block.id" class="d-flex toolbar">
+            <div class="toolbar-border toolbar-item"> 
+              <span style="padding: 0.5rem;" @click="moveUp(block.id)"><i class="fa-solid fa-caret-up pointer"></i></span>
+              <span style="padding: 0.5rem;" @click="moveDown(block.id)"><i class="fa-solid fa-caret-down pointer"></i></span>
+            </div>
+            <div class="toolbar-border toolbar-item">
+              <toolbar  @apply-formatting="applyFormatting"/>
+            </div>
+            <div class="toolbar-border toolbar-item"> 
+              <span @click="deleteSection(block.id)"><i class="fa-solid fa-trash pointer color-danger"></i></span>
+            </div>
           </div>
+          <h1 @click="selectBlock(block.id)" 
+              @focus="() => {storeSelection(); showToolbar = true;}"
+              @mouseup="storeSelection"
+              v-if="block.type === 'header1'" 
+              contenteditable 
+              @blur="updateContent(block.id)"
+              v-html="block.content"
+              :data-id="block.id">
+          </h1>
           <h2 @click="selectBlock(block.id)" 
-              @focus="storeSelection"
-              v-if="block.type === 'header'" 
+              @focus="() => {storeSelection(); showToolbar = true;}"
+              @mouseup="storeSelection"
+              v-if="block.type === 'header2'" 
               contenteditable 
               @blur="updateContent(block.id)"
               v-html="block.content"
               :data-id="block.id">
           </h2>
+          <h3 @click="selectBlock(block.id)" 
+              @focus="() => {storeSelection(); showToolbar = true;}"
+              @mouseup="storeSelection"
+              v-if="block.type === 'header3'" 
+              contenteditable 
+              @blur="updateContent(block.id)"
+              v-html="block.content"
+              :data-id="block.id">
+          </h3>
+          <h4 @click="selectBlock(block.id)" 
+              @focus="() => {storeSelection(); showToolbar = true;}"
+              @mouseup="storeSelection"
+              v-if="block.type === 'header4'" 
+              contenteditable 
+              @blur="updateContent(block.id)"
+              v-html="block.content"
+              :data-id="block.id">
+          </h4>
 
 
           <p @click="selectBlock(block.id)" 
@@ -35,7 +70,7 @@
 
           <blockquote 
             @click="selectBlock(block.id)" 
-            @focus="storeSelection"
+            @focus="() => {storeSelection(); showToolbar = true;}"
             v-else-if="block.type === 'quote'" 
             contenteditable 
             @blur="updateContent(block.id)"
@@ -49,7 +84,7 @@
             >
             <code contenteditable 
               @input="updateContent(block.id)"
-              @focus="storeSelection"
+              @focus="() => {storeSelection(); showToolbar = true;}"
               >
               {{ block.content }}
               </code>
@@ -63,6 +98,18 @@
             v-html="block.content"
             >
           </a>
+
+          <div 
+            @click="selectBlock(block.id)" 
+            @focus="() => {storeSelection(); showToolbar = true;}"
+            @blur="updateContent(block.id)"
+            v-else-if="block.type == 'image'"
+            class="image-container"
+            contenteditable
+            v-html="block.content"
+            :data-id="block.id"
+            > 
+          </div>
 
           <AddElement v-if="showToolbar && selectedBlock == block.id" @add-block="addBlock" @save-document="saveDocument" @show-add-element="showAddElement = !showAddElement"/>
         </div>
@@ -181,10 +228,9 @@ const showPopup = ref<boolean>(false);
 const popupMenu = ref<HTMLElement | null>();
 const documentModel = ref<element[]>([]); 
 const selectedBlock = ref<number | null>(null); 
-const toolbarAction = ref<number | null>(null);
-const linkInput = ref(""); 
-let lastSelection: Range | null = null;
+let lastSelection = ref<Range | null>(null);
 
+//Remove later
 const saveDocument = () => {
   console.log("document", documentModel.value)
 }
@@ -200,18 +246,17 @@ const postSettings = ref<PostSettings>({
 const storeSelection = () => {
   const selection = window.getSelection();
   if (selection && selection.rangeCount > 0) {
-    lastSelection = selection.getRangeAt(0);
+    lastSelection.value = selection.getRangeAt(0);
+  } else { 
+    lastSelection.value = null; 
   }
 };
 
-const restoreSelection = () => {
-  console.log("lastSelection", lastSelection);
-  if (lastSelection) {
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(lastSelection);
-  }
-};
+const resetSelection = () => {
+  lastSelection.value = null; 
+  const selection = window.getSelection(); 
+  if (selection) { selection.removeAllRanges(); }
+}
 
 const handleBlur = () => {
   storeSelection(); 
@@ -232,6 +277,15 @@ const updateContent = (id: number) => {
 };
 
 const addBlock = (type: string) => { 
+  if (type == 'header-image') {
+    headerImg.value = true; 
+    showModal.value = true; 
+    return;
+  }
+  if (type == 'image') { 
+    showModal.value = true; 
+    return;
+  }
   documentModel.value.push({
     id: documentModel.value.length, 
     type, 
@@ -240,15 +294,12 @@ const addBlock = (type: string) => {
 }
 
 const applyFormatting = (action: string, url?: string) => {
-  console.log(action, url); 
-  debugger; 
-  restoreSelection(); // Ensure the correct selection is active
-  if (selectedBlock.value == null || !lastSelection) return;
+  if (selectedBlock.value == null || !lastSelection.value) return;
   
   let block = documentModel.value.find(b => b.id === selectedBlock.value);
   if (!block) return;
 
-  const selectedText = lastSelection.toString();
+  const selectedText = lastSelection.value.toString()
   if (!selectedText) return;
 
   let formattedText = selectedText;
@@ -263,17 +314,16 @@ const applyFormatting = (action: string, url?: string) => {
     formattedText = `<a href="${url}" target="_blank">${selectedText}</a>`;
   }
 
-  // Replace the selected text with formatted text
-  lastSelection.deleteContents();
+  lastSelection.value.deleteContents();
   const newNode = document.createElement("span");
   newNode.innerHTML = formattedText;
-  lastSelection.insertNode(newNode);
+  lastSelection.value.insertNode(newNode);
 
-  // ✅ Ensure `documentModel` gets updated with new formatted content
   const element = document.querySelector(`[data-id="${block.id}"]`) as HTMLElement;
   if (element) {
     block.content = element.innerHTML;
   }
+  resetSelection(); 
 };
 
 const selectBlock = (id: number) => {
@@ -294,7 +344,6 @@ function moveUp(index: number) {
   documentModel.value[index].id = documentModel.value[index - 1].id;
   documentModel.value[index - 1].id = tempId;
   setTimeout(() => {isMoving = false}, 0);
-
 }
 
 function moveDown(index: number) { 
@@ -306,7 +355,10 @@ function moveDown(index: number) {
   documentModel.value[index].id = documentModel.value[index + 1].id;
   documentModel.value[index + 1].id = tempId;
   setTimeout(() => {isMoving = false}, 0);
+}
 
+function deleteSection(id: number) { 
+  documentModel.value = documentModel.value.filter((section) => section.id !== id); 
 }
 
 async function getPostById() {
@@ -380,11 +432,11 @@ async function save(updatedPostSettings: PostSettings) {
 }
 
 function saveAndPublish(updatedPostSettings: PostSettings) {
-  
   const post = setupPost(); 
   post.published = true, 
   post.publishedAt = new Date(); 
 }
+
 function generateTags() : void { 
   let tagSection = document.getElementById('tag-section'); 
   if (tagSection) { 
@@ -402,55 +454,6 @@ function generateTags() : void {
     return; 
   }
 }
-
-// function addSection(type: string) {
-//   if (['h2', 'h3', 'h4', 'p'].indexOf(type) > -1) {
-//     html.value.push({ id: html.value.length, html: `<${type}><i>placeholder...</i></${type}>`, children: [], attributes: "", editing: true, hover: false })
-//   }
-//   if (type == 'img') {
-//     headerImg.value = false;
-//     showModal.value = true; 
-//   }
-//   if (type == 'header-img') {
-//     headerImg.value = true;
-//     showModal.value = true; 
-//   }
-//   if (type == 'affiliate') {
-//     html.value.push({id: html.value.length, html: `<section><i>Disclosure: This post may contain affiliate links, meaning I get a commission if you decide to make a purchase through my links, at no cost to you.</i></section>`, children: [], attributes: "", editing: false, hover: false})
-//   }
-
-//   if (type == 'tags') {
-//     html.value.push({ id: html.value.length, html: `<section id='tag-section' class='d-flex align-items-center justify-content-center'></section>`, children: [], attributes: "", editing: false, hover: false })
-//     setTimeout(() => {
-//       generateTags();
-//     }, 250);  
-//   }
-//   if (type == 'code') {
-//     let lang = prompt("Which language is the code?"); 
-//     if (!lang) {
-//       console.error("No language added"); 
-//       return; 
-//     }
-
-//     html.value.push({ id: html.value.length, html: `<pre><code>code</code></pre>`, children: [], attributes: "", editing: true, hover: false })
-//   }
-//   if (type == 'ad') {
-//     console.error("Adding ads isn't supported yet")
-//       const adHtml = `<div align="center" class="ads"></div>`;
-//     html.value.push({
-//       id: html.value.length,
-//       html: adHtml,
-//       children: [],
-//       attributes: "",
-//       editing: false,
-//       hover: false
-//     });
-//   }
-//   showPopup.value = false;
-// }
-// function togglePopup() {
-//   showPopup.value = !showPopup.value;
-// }
 
 function setupPost(): Post {
   const titleDom = new DOMParser(); 
@@ -474,24 +477,38 @@ function setupPost(): Post {
   return post; 
 }
 
-function handleClickOutside(event: MouseEvent) {
-  if (popupMenu.value && !popupMenu.value.contains(event.target as Node)) {
-    showPopup.value = false;
-  }
-}
-
 function updateImageUrl(url : string | null) : void { 
   imageUrl.value = url; 
   console.log("Image URL", imageUrl.value);
 }
 
+// const getImageUrl = (htmlString: string) => {
+//   const parser = new DOMParser();
+//   const doc = parser.parseFromString(htmlString, "text/html");
+//   const img = doc.querySelector("img");
+//   return img ? img.src : "";
+// };
+
 function submitImage(): void { 
-  let htmlStr = `<img src="${imageUrl.value}" alt=""/>`
+  if (!imageUrl.value) { return; }
+  let imgHtml = `<figure>
+                  <img src="${imageUrl.value}" alt="" class="post-image"/>
+                  <figcaption>Caption....</figcaption>
+                </figure>  
+                `
   if (headerImg.value) { 
-    htmlStr = `<img src="${imageUrl.value}" class="header-img" alt=""/>`
+    imgHtml = `<img src="${imageUrl.value}" class="header-img" alt=""/>`
   }
-  documentModel.value.push({ id: documentModel.value.length, content: htmlStr, type: 'image'}); 
+
+  documentModel.value.push({
+    id: documentModel.value.length, 
+    type: 'image',
+    content: imgHtml
+  })
+
   showModal.value = false; 
+  imageUrl.value = null; 
+  headerImg.value = false; 
 }
 
 
@@ -500,12 +517,7 @@ onMounted(async () => {
     createPost.value = false; 
     await getPostById(); 
   }
-  document.addEventListener("click", handleClickOutside);
 });
-
-onBeforeUnmount(() => {
-  document.removeEventListener("click", handleClickOutside);
-})
 </script>
 
 <style scoped>
@@ -522,28 +534,34 @@ onBeforeUnmount(() => {
 .border-left {
   border-left: 1px solid var(--color)
 }
-
-.add-section-container,
-.add-section {
-  position: relative;
-}
-
-
-.editor {
-  max-width: 600px;
-  margin: auto;
-  font-family: sans-serif;
-}
 .toolbar {
   display: flex;
-  gap: 8px;
+  gap: 5px;
+  margin-top: 10px;
   margin-bottom: 10px;
+  width: max-content;
+  position: relative; 
 }
-button {
-  cursor: pointer;
+.toolbar-item {
   padding: 5px;
-  margin: 3px;
 }
+.toolbar-border {border: 1px solid var(--color)}
+
+.toolbar button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #0073aa;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.header-img { 
+  max-width: 100vw; 
+  object-fit: cover;
+  object-position: top;
+}
+
 [contenteditable] {
   outline: none;
   border: 1px solid lightgray;
