@@ -47,10 +47,10 @@ onMounted(async () => {
     // console.log("Checking session on mount...");
     const { data } = await supabase.auth.getSession();
 
-    if (data.session?.access_token) {
-        console.log("Session found on mount:", data);
-        localStorage.setItem("jwt", data.session.access_token);
-    } else {
-        console.log("No session found on mount.");
-    }
+    // if (data.session?.access_token) {
+    //     console.log("Session found on mount:", data);
+    //     localStorage.setItem("jwt", data.session.access_token);
+    // } else {
+    //     console.log("No session found on mount.");
+    // }
 });

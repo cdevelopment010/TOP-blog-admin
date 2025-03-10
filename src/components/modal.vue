@@ -1,6 +1,6 @@
 <template>
     <div v-if="show" class="modal-overlay">
-        <div class="modal-content d-flex flex-column align-items-center justify-content-center">
+        <div class="modal-content">
             <button class="modal-close" @click="closeModal">x</button>
             <slot name="header"></slot>
             <slot></slot>
@@ -32,6 +32,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow-y: auto;
+    padding: 20px; 
 }
 .modal-content {
     background: white;
@@ -42,7 +44,15 @@
     position: relative;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh; 
+    overflow-y: auto; 
+    align-self: center;
+    /* display: flex; 
+    flex-direction: column; 
+    align-items: center; */
 }
+
+
 .modal-close {
     position: absolute;
     top: 10px;

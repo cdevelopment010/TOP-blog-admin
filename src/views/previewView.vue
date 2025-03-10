@@ -80,9 +80,9 @@
     tags: [],
     keywords: ''
   });
-  watch(html, (newVal) => {
-    loadGoogleAds(); 
-  }, { deep: true });
+  // watch(html, (newVal) => {
+  //   loadGoogleAds(); 
+  // }, { deep: true });
   
   
 
@@ -108,7 +108,7 @@
                 const data = await response.json(); 
                 console.log("update post:",data.data.content)
                 html.value = JSON.parse(data.data.content);
-                loadGoogleAds(); 
+                // loadGoogleAds(); 
               }
           })
           .catch(err => {
