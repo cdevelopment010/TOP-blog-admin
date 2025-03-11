@@ -1,9 +1,13 @@
 <template>
     <div class=" w-80 mx-auto">
         <div class="d-flex flex-column">
+            <label for="slug" class="flex-start">Title:</label>
+            <input type="text" v-model="postSettings.title" @input="updateField('title', postSettings.title || '')">
+        </div>
+
+        <div class="d-flex flex-column">
             <label for="slug" class="flex-start">Slug:</label>
             <input type="text" v-model="postSettings.slug" @input="updateField('slug', postSettings.slug || '')">
-            <small>{{ slugCombined }}</small>
         </div>
 
         <div class="d-flex  flex-column">
@@ -62,6 +66,7 @@ interface PostSettings {
     tags?: {id: number, name: string}[] | null,
     description?: string | null,
     keywords?: string | null
+    title?: string | null
 }
 
 const availableTags = ref<Tag[]>([]);

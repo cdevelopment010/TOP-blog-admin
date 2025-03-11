@@ -7,7 +7,7 @@
       <!-- Main section -->
       <div class="create-post-section">
         
-        <AddElement v-if="documentModel.length == 0"  @add-block="addBlock" @save-document="saveDocument" @show-add-element="showAddElement = !showAddElement"/>
+        <AddElement v-if="documentModel.length == 0"  @add-block="addBlock" @show-add-element="showAddElement = !showAddElement"/>
         <div v-for="(block, index) in documentModel" :key="block.id" >
           <div v-if="showToolbar && selectedBlock == block.id" class="d-flex toolbar">
             <div class="toolbar-border toolbar-item"> 
@@ -120,7 +120,7 @@
             > 
           </div>
 
-          <AddElement v-if="showToolbar && selectedBlock == block.id" @add-block="addBlock" @save-document="saveDocument" @show-add-element="showAddElement = !showAddElement"/>
+          <AddElement v-if="showToolbar && selectedBlock == block.id" @add-block="addBlock" @show-add-element="showAddElement = !showAddElement"/>
         </div>
 
 
@@ -204,7 +204,8 @@ interface PostSettings {
   slug?: string | null,
   tags?: {id: number, name: string}[] | null,
   description?: string | null,
-  keywords?: string | null
+  keywords?: string | null,
+  title?: string | null,
 }
 
 interface Post {
@@ -239,17 +240,13 @@ const documentModel = ref<element[]>([]);
 const selectedBlock = ref<number | null>(null); 
 let lastSelection = ref<Range | null>(null);
 
-//Remove later
-const saveDocument = () => {
-  console.log("document", documentModel.value)
-}
-
 const postSettings = ref<PostSettings>({
   id: null,
   slug: '',
   description: '',
   tags: [],
-  keywords: ''
+  keywords: '',
+  title: ''
 });
 
 const storeSelection = () => {
@@ -350,6 +347,7 @@ const selectBlock = (id: number) => {
 
 function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
+  console.log(postSettings.value);
   generateTags(); 
 }
 let isMoving = false; 
@@ -474,8 +472,7 @@ function generateTags() : void {
 }
 
 function setupPost(): Post {
-  const titleDom = new DOMParser(); 
-  const title = titleDom.parseFromString(documentModel.value[0].content, "text/html").body.textContent;
+  const title = postSettings.value.title ?? '' ;
 
   const post: Post = { 
     title: title,
