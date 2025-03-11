@@ -13,17 +13,17 @@ interface User {
 }
 export const currentUser = ref<User|null>(null);
 
-supabase.auth.onAuthStateChange((event, session) => {
-    // console.log("Auth state changed:", event, session);
+// supabase.auth.onAuthStateChange((event, session) => {
+//     console.log("Auth state changed:", event, session);
 
-    if (session?.access_token) {
-        console.log("Saving token to localStorage...");
-        localStorage.setItem("jwt", session.access_token);
-    } else {
-        console.log("No session found, clearing storage.");
-        localStorage.removeItem("jwt");
-    }
-});
+//     if (session?.access_token) {
+//         console.log("Saving token to localStorage...");
+//         localStorage.setItem("jwt", session.access_token);
+//     } else {
+//         console.log("No session found, clearing storage.");
+//         localStorage.removeItem("jwt");
+//     }
+// });
 
 export function isAuthenticated(): boolean { 
 
