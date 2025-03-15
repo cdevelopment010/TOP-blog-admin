@@ -5,7 +5,7 @@
               <h4 v-if="toast.title" class="m-0">{{ toast.title }}</h4>
               <button @click="removeToast(toast.id)" class="m-0">X</button>
             </div>
-            <p>{{ toast.message }}</p>
+            <p style="white-space: pre-line;">{{ toast.message }}</p>
         </div>
     </div>
 

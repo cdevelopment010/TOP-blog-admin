@@ -108,6 +108,7 @@ button:focus-visible {
 .flex-wrap { flex-wrap: wrap;}
 .flex-column { flex-direction: column;}
 .align-items-center{align-items: center;}
+.align-items-start{align-items: flex-start;}
 .justify-content-evenly { justify-content: space-evenly;}
 .justify-content-center {justify-content: center;}
 .justify-content-between {justify-content: space-between;}

@@ -31,7 +31,8 @@
                             <td>
                                 <RouterLink :to="`/posts/update-post/${post.id}`" class="btn me-2">Update</RouterLink>
                                 <button class="btn me-2" @click="deletePost(post.id)">Delete</button>
-                                <RouterLink :to="`/posts/preview-post/${post.id}`" class="btn">Preview</RouterLink>
+                                <RouterLink :to="`/posts/preview-post/${post.id}`" class="btn me-2">Preview</RouterLink>
+                                <RouterLink :to="{path: `/posts/${post.id}/comments`, query: {title: post.title}}" class="btn me-2">Manage Comments</RouterLink>
                             </td>
                         </tr>
                     </template>

@@ -8,6 +8,7 @@ import TagList from '../views/TagList.vue';
 import PostView from '../views/PostView.vue';
 import CreatePostView from '../views/CreatePostView.vue';
 import previewView from '../views/previewView.vue';
+import ManageComments from '../views/ManageComments.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL), 
@@ -20,7 +21,8 @@ const router = createRouter({
         {path: '/tags', name: 'tags', component: TagList, meta: { requiresAuth: true }}, 
         {path: '/posts/new-post', name: 'new-post', component: CreatePostView, meta: { requiresAuth: true }}, 
         {path: '/posts/update-post/:id', name: 'update-post', component: CreatePostView, meta: { requiresAuth: true }},
-        {path: '/posts/preview-post/:id', name: 'preview-post', component: previewView, meta: { requiresAuth: true }}
+        {path: '/posts/preview-post/:id', name: 'preview-post', component: previewView, meta: { requiresAuth: true }},
+        {path: '/posts/:id/comments', name: 'Comments', component: ManageComments, meta: { requiresAuth: true}}
         //{path: '/about', name: 'about', component: () => import('../views/AboutView.vue'), meta: { requiresAuth: true }} //Lazy-loaded (route level code-splitting)
     ]
 })
