@@ -52,7 +52,7 @@ const saveDocument = () => {
     top: 50%; 
     height: 2px; 
     width: 100%; 
-    background: black;
+    background: var(--color);
 }
 
 .add-element > i { 
@@ -78,7 +78,8 @@ const saveDocument = () => {
 
 .editor > button { 
     width: 50px; 
-    background: white; 
+    background: var(--background-color); 
+    color: var(--color);
 }
 
 </style>
