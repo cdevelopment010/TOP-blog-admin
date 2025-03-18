@@ -15,7 +15,7 @@
                     <input type="password" id="password" name="password" required v-model="password">
                 </div>
     
-                <button type="submit" class="btn">Login</button>
+                <button type="submit" class="btn">Login <i v-if="loggingIn" class="fa-solid fa-circle-notch fa-spin"></i></button>
             </form>
     
             <!-- <button @click="signInWithGoogle">Sign in with Google</button> -->
@@ -54,6 +54,7 @@ const { addToast } = useToast();
 const email = ref('');
 const password = ref(''); 
 const errorMessage = ref(''); 
+const loggingIn = ref(false); 
 
 const resetPassword = async () => {
     if (email.value == "" || !email.value) {
@@ -86,6 +87,7 @@ const resetPassword = async () => {
 
 const handleSubmit = async () => {
     try { 
+        loggingIn.value = true; 
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email.value, 
             password: password.value
@@ -104,7 +106,10 @@ const handleSubmit = async () => {
             body: JSON.stringify({ email: email.value, password: password.value})
         })
         
-        if (!response.ok) { throw new Error('Failed to log in')}
+        if (!response.ok) { 
+            loggingIn.value = false;
+            throw new Error('Failed to log in')
+        }
         const dataResponse = await response.json(); 
         // save token
         localStorage.setItem('jwt', dataResponse.token)
@@ -112,11 +117,14 @@ const handleSubmit = async () => {
         if (data.user) {
             currentUser.value = dataResponse.user; 
         }
-
+        
+        loggingIn.value = false;
         //redirect needed
         router.push("/")
     } catch (err: any) {
         errorMessage.value = err.message; 
+        
+        loggingIn.value = false;
     }
 }
 
