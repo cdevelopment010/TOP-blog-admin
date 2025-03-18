@@ -1,23 +1,35 @@
 <template>
-    <h1>
-        Sign In
-    </h1>
 
-    <form @submit.prevent="handleSubmit">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required v-model="email">
-        
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required v-model="password">
+    <div class="sign-in-container"> 
+        <div class="sign-in-body-container">
+            <h1 class="mb-2">Sign In</h1>
+    
+            <form @submit.prevent="handleSubmit" class="mb-2">
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required v-model="email">
+                </div>
+                
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required v-model="password">
+                </div>
+    
+                <button type="submit" class="btn">Login</button>
+            </form>
+    
+            <!-- <button @click="signInWithGoogle">Sign in with Google</button> -->
+    
+            <button class="btn w-100" @click="resetPassword">Reset Password</button>
+    
+            <p v-if="errorMessage" class="error">{{ errorMessage  }}</p>
+        </div>
 
-        <button type="submit">Login</button>
-    </form>
+    </div>
 
-    <!-- <button @click="signInWithGoogle">Sign in with Google</button> -->
+    
 
-    <button class="btn" @click="resetPassword">Reset Password</button>
-
-    <p v-if="errorMessage" class="error">{{ errorMessage  }}</p>
+    
 
     <!-- <div>
         <RouterLink to="/sign-up">Create Account</RouterLink>
@@ -109,3 +121,68 @@ const handleSubmit = async () => {
 }
 
 </script>
+
+<style scoped>
+.sign-in-container { 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #181818;
+}
+
+.sign-in-body-container { 
+    background-color: #222;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.sign-in-body-container h1 {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+
+.sign-in-body-container form { 
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+
+.sign-in-body-container form div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #bbb;
+    width: 80px; /* Fixed width so labels align nicely */
+    text-align: right;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+}
+
+input:focus {
+    border-color: #888;
+}
+
+
+</style>

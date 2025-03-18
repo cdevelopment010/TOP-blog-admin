@@ -124,6 +124,7 @@ button:focus-visible {
 .mx-auto {margin-inline: auto;}
 
 .w-80 {width: 80%;}
+.w-100 {width: 100% !important;}
 
 .pointer {cursor: pointer;}
 
