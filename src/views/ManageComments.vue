@@ -72,8 +72,8 @@ const getCommentsByPostId = async (postId: number)  => {
 }
 
 const deleteComment = async (commentId : number) => {
-    // const url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${postId.value}/comments/${commentId}`; 
-    const url = `http://localhost:3000/post/${postId.value}/comments/${commentId}`; 
+    const url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${postId.value}/comments/${commentId}`; 
+    // const url = `http://localhost:3000/post/${postId.value}/comments/${commentId}`; 
     console.log(localStorage.getItem('jwt'));
     await fetch(url, {
                 mode: 'cors',
