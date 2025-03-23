@@ -32,7 +32,8 @@
     }
 
     const signOut = async () => {
-        await supabase.auth.signOut(); 
+        console.log("SignOut")
+        await supabase.auth.signOut().then(() => console.log("Signed Out complete")); 
     }
 
 

@@ -72,11 +72,12 @@ const getCommentsByPostId = async (postId: number)  => {
 }
 
 const deleteComment = async (commentId : number) => {
-    const url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${postId.value}/comments/${commentId}`; 
-
+    // const url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${postId.value}/comments/${commentId}`; 
+    const url = `http://localhost:3000/post/${postId.value}/comments/${commentId}`; 
+    console.log(localStorage.getItem('jwt'));
     await fetch(url, {
                 mode: 'cors',
-                signal: AbortSignal.timeout(10 * 1000),
+                signal: AbortSignal.timeout(30 * 1000),
                 method: 'DELETE', 
                 headers: { 'Content-Type': 'application/json', 'authorization': `bearer: ${localStorage.getItem('jwt')}`},
     }).then(async response => {
