@@ -402,6 +402,7 @@ async function getPostById() {
               postSettings.value.description = data.data.metaDescription;
               postSettings.value.keywords = data.data.metaKeywords; 
               postSettings.value.slug = data.data.slug;
+              postSettings.value.id = data.data.id;
 
               //fix - data.data doesn't contain tags. 
             }

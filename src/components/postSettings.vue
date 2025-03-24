@@ -19,6 +19,7 @@
                 </template>
             </select>
             <template v-for="(tag, index) in tags">
+                <!-- {{  tag[0] }} -->
                 <div @click="deleteTag(index)" class="pill" title="Click to remove">{{ tag.name }}</div>
             </template>
         </div>
@@ -84,13 +85,12 @@ watch(() => props.postSettings, (newSettings) => {
     postSettings.value = { ...newSettings };
 }, { deep: true });
 
-const slugCombined = computed(() =>
-    postSettings.value.slug?.toLowerCase().split(" ").join("-") || ""
-);
+watch(() => props.postSettings.id, async (newId) => {
+    if (newId !== null) { await getSelectedTags()}
+})
 
 function updateField(field: keyof PostSettings, value: string | null | number | undefined | {id: number, name: string}[]) {
     postSettings.value = { ...postSettings.value, [field]: value };
-    console.log("postSettings", postSettings.value);
     emit('update', postSettings.value);
 }
 
@@ -108,6 +108,32 @@ function addTag(event: Event) {
 function deleteTag(index: number) {
     tags.value.splice(index, 1);
 
+}
+
+const getSelectedTags = async() => { 
+    try { 
+        if (postSettings.value.id == null ) { throw new Error("Missing post ID to retrieve tags.")}
+        const url = `https://top-blog-api-proud-thunder-6960.fly.dev/post/${postSettings.value.id}/tags`
+        const response = await fetch(url, {
+            mode: 'cors',
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'authorization': `bearer: ${localStorage.getItem('jwt')}` 
+            },
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            console.error("ERROR: Tags -", errorResponse);
+            throw new Error(`Error: ${errorResponse.message || "Failed to fetch tags for post"}`);
+        }
+
+        const data = await response.json();
+        tags.value = data.data.tags;
+    } catch (err) {
+        console.error("err:", err); 
+    }
 }
 
 const refreshTags = async (): Promise<Tag[] | void> => {
@@ -139,7 +165,7 @@ const refreshTags = async (): Promise<Tag[] | void> => {
 onMounted( async() => {
     //load tags
     availableTags.value = await refreshTags() ?? []; 
-    
+    await getSelectedTags(); 
 })
 
 </script>
