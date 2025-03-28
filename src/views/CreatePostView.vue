@@ -7,7 +7,7 @@
       <!-- Main section -->
       <div class="create-post-section">
         
-        <AddElement v-if="documentModel.length == 0"  @add-block="addBlock" @show-add-element="showAddElement = !showAddElement"/>
+        <AddElement v-if="documentModel.length == 0" :is-open="showAddElement" @add-block="addBlock" @show-add-element="showAddElement = !showAddElement"/>
         <div v-for="(block, index) in documentModel" :key="block.id" >
           <div v-if="showToolbar && selectedBlock == block.id" class="d-flex toolbar">
             <div class="toolbar-border toolbar-item"> 
@@ -26,7 +26,7 @@
               @mouseup="storeSelection"
               v-if="block.type === 'header1'" 
               contenteditable 
-              @blur="updateContent(block.id)"
+              @blur="(e) => { handleBlur(); updateContent(block.id)}"
               v-html="block.content"
               :data-id="block.id">
           </h1>
@@ -77,6 +77,35 @@
             :data-id="block.id">
           </p>
 
+          <ul
+            v-else-if="block.type === 'list'"
+            @click="selectBlock(block.id)"
+            :data-id="block.id"
+          >
+            <template v-for="(child, index) in block.children" :key="block.id + '-' + index">
+                <li 
+                contenteditable 
+                @keydown.enter.prevent="addListItem(block.id, index)"
+                @keydown.backspace = "handleBackspaceListItem(block.id, index, $event)"
+                @focus="() => {storeSelection(); showToolbar = true;}"
+                @blur="(e) => { updateListItem(block.id, index, e)}"
+                v-html="child"
+                >
+              </li>
+              <!-- <div class="d-flex">
+                <li 
+                contenteditable 
+                @keydown.enter.prevent="addListItem(block.id, index)"
+                @focus="() => {storeSelection(); showToolbar = true;}"
+                @blur="(e) => { updateListItem(block.id, index, e)}"
+                v-html="child"
+                >
+              </li>
+              <button @click="deleteListItem(block.id, index)">DELETE</button>
+              </div> -->
+            </template>
+          </ul>
+
           <blockquote 
             @click="selectBlock(block.id)" 
             @focus="() => {storeSelection(); showToolbar = true;}"
@@ -120,7 +149,7 @@
             > 
           </div>
 
-          <AddElement v-if="showToolbar && selectedBlock == block.id" @add-block="addBlock" @show-add-element="showAddElement = !showAddElement"/>
+          <AddElement v-if="showToolbar && selectedBlock == block.id" :is-open="showAddElement" @add-block="addBlock" @show-add-element="showAddElement = !showAddElement"/>
         </div>
 
 
@@ -158,7 +187,7 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import NavComponent from '../components/nav.vue';
 import PostSettings from '../components/postSettings.vue';
@@ -196,7 +225,7 @@ interface element {
   content: string;
   language?: string;
   url?: string;
-  children?: element[];
+  children?: any[];
 }
 
 interface PostSettings {
@@ -269,6 +298,7 @@ const handleBlur = () => {
   setTimeout(() => {
     if (!showAddElement.value) { 
       showToolbar.value = false; 
+      console.log("toolbar:", showToolbar.value);
     }
   }, 250)
 }
@@ -283,6 +313,7 @@ const updateContent = (id: number) => {
 };
 
 const addBlock = (type: string) => { 
+  showAddElement.value = false;
   if (type == 'header-image') {
     headerImg.value = true; 
     showModal.value = true; 
@@ -301,11 +332,23 @@ const addBlock = (type: string) => {
     })
     return; 
   }
+
+  if (type == 'list') { 
+    documentModel.value.push({
+      id: documentModel.value.length, 
+      type, 
+      content: '',
+      children: ['List Item 1']
+    })
+    return; 
+  }
   documentModel.value.push({
     id: documentModel.value.length, 
     type, 
     content: type === "code" ? "console.log('New code block');" : "New " + type
   })
+
+  
 }
 
 const applyFormatting = (action: string, url?: string) => {
@@ -344,6 +387,79 @@ const applyFormatting = (action: string, url?: string) => {
 const selectBlock = (id: number) => {
   selectedBlock.value = id;
 };
+
+const addListItem = (blockId: number, index: number) => {
+  const block = documentModel.value.find(b => b.id === blockId); 
+  if (!block) { return }
+
+  block.children?.splice(index + 1, 0, ''); 
+  nextTick(() => {
+    const ul = document.querySelector(`[data-id="${blockId}"]`);
+    const li = ul?.children[index+1] as HTMLElement;
+    li?.focus();  
+  })
+}
+
+const deleteListItem = (blockId: number, index: number) => { 
+  const block = documentModel.value.find(b => b.id === blockId); 
+  if (!block) { return }
+
+  if (!block.children) { return }
+
+  let newBlockChidlren = [...block.children];
+  newBlockChidlren.splice(index, 1); 
+
+  block.children = newBlockChidlren;
+}
+
+const handleBackspaceListItem = (blockId: number, index: number, e: KeyboardEvent) => {
+  const block = documentModel.value.find(b => b.id === blockId);
+  if (!block?.children) return;
+
+  const li = e.target as HTMLElement;
+  const text = li.innerText.trim();
+  const html = li.innerHTML.trim();
+  const isEmpty = text === '' || html === '<br>';
+
+  if (!isEmpty) return;
+
+  // Don't delete if there's only one item, just clear it
+  if (block.children.length === 1) {
+    e.preventDefault();
+    block.children = [''];
+    li.innerHTML = ''; // clear the visual content
+    return;
+  }
+
+  // Prevent default and delete the item
+  e.preventDefault();
+  const updated = [...block.children];
+  updated.splice(index, 1);
+  block.children = updated;
+
+  setTimeout(() => {
+    const ul = document.querySelector(`[data-id="${blockId}"]`);
+    const prevLi = ul?.children[Math.max(0, index - 1)] as HTMLElement;
+    prevLi?.focus();
+    console.log("backspace", block.children)
+  },0)
+};
+
+const updateListItem = async (blockId: number, index: number, e : Event) => {
+  setTimeout(() => {
+    const block = documentModel.value.find(b => b.id === blockId); 
+    if (!block || !block.children) { return }
+    const li = e.target as HTMLElement;
+    const html = li.innerHTML.trim();
+    if (html === '<br>' || html === '') { return; }
+
+    const updatedChildren = [...block.children];
+    updatedChildren[index] = html === '<br>' ? '' : html;
+
+    block.children = updatedChildren;
+  }, 100)
+
+}
 
 function updatePostSettings(updatedPostSettings: PostSettings) {
   postSettings.value = updatedPostSettings;
