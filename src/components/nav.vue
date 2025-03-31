@@ -3,6 +3,7 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/posts">Posts</RouterLink>
         <RouterLink to="/tags">Tags</RouterLink>
+        <a href="https://analytics.google.com/analytics/web/?authuser=1#/p471201004/reports/intelligenthome" target="_blank">Analytics</a>
 
         <div>
             <button id="theme-switcher" @click="changeThemes">
