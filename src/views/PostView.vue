@@ -4,40 +4,39 @@
             <NavComponent />
         </div>
         
-        <div class="body-container">
-            <h1>Posts</h1>
-            <RouterLink to="/posts/new-post">Create Post</RouterLink>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Created</th>
-                        <th>Published</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-for="(post, index) in posts" :key="`post-${index}`">
+        <div class="body-container w-50 mx-auto">
+            <h1 style="text-align: left;">Posts</h1>
+            <div class="d-flex flex-column p-5 border border-radius-1">
+                <RouterLink to="/posts/new-post" class="ms-auto mb-2">Create Post</RouterLink>
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ post.title }}</td>
-                            <td>{{ new Date(post.createdAt).toLocaleDateString() }} {{ new Date(post.createdAt).toLocaleTimeString() }}</td>
-                            <td> 
-                                <button
-                                    @click="changePostPublish(post.published, post.id)"    
-                                >
-                                    {{ post.published }}
-                                </button>
-                            </td>
-                            <td>
-                                <RouterLink :to="`/posts/update-post/${post.id}`" class="btn me-2">Update</RouterLink>
-                                <button class="btn me-2" @click="deletePost(post.id)">Delete</button>
-                                <RouterLink :to="`/posts/preview-post/${post.id}`" class="btn me-2">Preview</RouterLink>
-                                <RouterLink :to="{path: `/posts/${post.id}/comments`, query: {title: post.title}}" class="btn me-2">Manage Comments</RouterLink>
-                            </td>
+                            <th>Title</th>
+                            <th>Created</th>
+                            <th>Published</th>
+                            <th>Actions</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <template v-for="(post, index) in posts" :key="`post-${index}`">
+                            <tr>
+                                <td>{{ post.title }}</td>
+                                <td width="200px">{{ new Date(post.createdAt).toLocaleDateString() }} {{ new Date(post.createdAt).toLocaleTimeString() }}</td>
+                                <td width="80px"> 
+                                    <input type="checkbox" :checked="post.published" @click="changePostPublish(post.published, post.id)"/>
+                                </td>
+                                <td width="200px">
+                                    <RouterLink :to="`/posts/update-post/${post.id}`" class="btn me-2"><i class="fa-solid fa-pen-to-square"></i></RouterLink>
+                                    <button class="btn me-2" @click="deletePost(post.id)"><i class="fa-solid fa-trash"></i></button>
+                                    <!-- <RouterLink :to="`/posts/preview-post/${post.id}`" class="btn me-2">Preview</RouterLink> -->
+                                    <RouterLink :to="{path: `/posts/${post.id}/comments`, query: {title: post.title}}" class="btn me-2"><i class="fa-solid fa-comments"></i></RouterLink>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -157,7 +156,7 @@ onMounted(async () => {
 <style scoped>
 table { 
     margin-inline: auto;
-    width: 90%;
+    width: 100%;
     border-collapse: collapse;    
 }
 

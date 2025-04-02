@@ -174,11 +174,5 @@ onMounted(async () => {
 </script>
 
 <style>
-    .me-2 { margin-right: 0.5rem;}
-    .mb-2 { margin-bottom: 0.5rem;}
-    .mb-3 { margin-bottom: 0.75rem;}
-    .mb-4 { margin-bottom: 1rem;}
-    .mt-2 { margin-top: 0.5rem;}
-    .mt-3 { margin-top: 0.75rem;}
-    .mt-4 { margin-top: 1rem;}
+    
 </style>
