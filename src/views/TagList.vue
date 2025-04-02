@@ -3,18 +3,46 @@
         <div class="nav-container">
             <NavComponent />
         </div>
-        <div class="body-container">
-            <h1>Tags</h1>
-            <button @click="showModal = true; createEditTag='Create'">Create Tag</button>
+        <div class="body-container  w-80 mx-auto w-md-50">
+            <h1  style="text-align: left;">Tags</h1>
 
-            <template v-if="errorMsg">
-                <span>There was an error getting the data!</span>
-                <div>
-                    {{ errorMsg }}
-                </div>
-            </template>
+            <div class="d-flex flex-column p-5 border border-radius-1">
+                <button @click="showModal = true; createEditTag='Create'" class="ms-auto mb-2">Create Tag</button>
+                <template v-if="errorMsg">
+                    <span>There was an error getting the data!</span>
+                    <div>
+                        {{ errorMsg }}
+                    </div>
+                </template>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <!-- <th>created By User</th> -->
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(tag, index) in tagList" :key="`tag-${index}`">
+                            <tr>
+                                <td>{{ tag.name }}</td>
+                                <!-- <td>{{ tag.createdByUser }}</td> -->
+                                <td width="200px">{{ new Date(tag.createdAt).toLocaleDateString() }} {{ new Date(tag.createdAt).toLocaleTimeString() }}</td>
+                                <td width="200px">
+                                    <button @click="editTag(tag)" class="me-2"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button @click="deleteTag(tag.id)"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+            </div>
+
         
-            <template v-for="(tag, index) in tagList" :key="index">
+            <!-- <template v-for="(tag, index) in tagList" :key="index">
                 <div class="d-flex align-items-center justify-content-center mb-2 mt-2">
                     <span class="me-2 flex-start">{{ tag?.name }}</span>
                     <span class="me-2 flex-start">{{ tag?.createdByUser }}</span>
@@ -25,7 +53,7 @@
                     </div>
                 </div>
                 <hr>
-            </template>
+            </template> -->
         </div>
         
     </div>

@@ -4,7 +4,7 @@
             <NavComponent />
         </div>
         
-        <div class="body-container w-50 mx-auto">
+        <div class="body-container w-80 mx-auto w-md-50">
             <h1 style="text-align: left;">Posts</h1>
             <div class="d-flex flex-column p-5 border border-radius-1">
                 <RouterLink to="/posts/new-post" class="ms-auto mb-2">Create Post</RouterLink>
@@ -154,21 +154,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-table { 
-    margin-inline: auto;
-    width: 100%;
-    border-collapse: collapse;    
-}
 
-table td { 
-    border: 1px solid var(--color);
-}
-table th { 
-    border: 1px solid var(--background-color);
-}
-
-table thead { 
-    background-color: var(--color);
-    color: var(--background-color); 
-}
 </style>

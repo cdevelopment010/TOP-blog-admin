@@ -197,6 +197,24 @@ button:focus-visible {
   color: var(--background-color);
 }
 
+table { 
+  margin-inline: auto;
+  width: 100%;
+  border-collapse: collapse;    
+}
+
+table td { 
+  border: 1px solid var(--color);
+}
+table th { 
+  border: 1px solid var(--background-color);
+}
+
+table thead { 
+  background-color: var(--color);
+  color: var(--background-color); 
+}
+
 /* Testing */
 .highlight { 
   background: yellow;
@@ -233,4 +251,10 @@ button:focus-visible {
     justify-content: flex-start;
   }
 
+  
+
+}
+
+@media screen and (min-width: 1800px) {
+  .w-md-50 { width: 50%;}
 }
