@@ -116,17 +116,26 @@
             >
           </blockquote>
 
-          <pre 
-            @click="selectBlock(block.id)" 
-            v-else-if="block.type === 'code'"
-            >
-            <code contenteditable 
-              @input="updateContent(block.id)"
-              @focus="() => {storeSelection(); showToolbar = true;}"
+          <div v-else-if="block.type === 'code'">
+            <select v-model="block.language">
+              <option value="">--None--</option>
+              <option value="css">CSS</option>
+              <option value="html">HTML</option>
+              <option value="js">JS</option>
+              <option value="sql">SQL</option>
+              <option value="csharp">C#</option>
+
+            </select>
+            <pre 
+              @click="selectBlock(block.id)" 
               >
-              {{ block.content }}
-              </code>
-          </pre>
+              <code contenteditable 
+                @blur="updateContent(block.id)"
+                @focus="() => {storeSelection(); showToolbar = true;}"
+                :data-id="block.id"
+                v-html="block.content"></code>
+            </pre>
+          </div>
           <a 
             @click="selectBlock(block.id)" 
             @focus="storeSelection"
@@ -306,6 +315,7 @@ const updateContent = (id: number) => {
   const block = documentModel.value.find(b => b.id === id);
   if (!block) return;
 
+  console.log(block);
   const element = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
   if (element) {
     block.content = element.innerHTML; // Preserve formatting properly
