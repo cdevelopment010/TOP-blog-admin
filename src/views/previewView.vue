@@ -6,9 +6,77 @@
       <div class="body-container post-grid">
         <!-- Main section -->
         <div class="create-post-section">
-          <template v-for="(el, index) in html" :key="el.id">
-            <PreviewComponent :data="el"/>
-          </template>
+          <template v-for="(el) in html" :key="el.id">
+                    <h1 
+                        v-if="el.type === 'header1'" 
+                        v-html="el.content">
+                    </h1>
+                    <h2 
+                        v-if="el.type === 'header2'" 
+                        v-html="el.content">
+                    </h2>
+                    <h3
+                        v-if="el.type === 'header3'" 
+                        v-html="el.content">
+                    </h3>
+                    <h4 
+                        v-if="el.type === 'header4'" 
+                        v-html="el.content">
+                    </h4>
+                    <div
+                        v-else-if="el.type == 'tag'"
+                        id="tag-section"
+                    > 
+                    </div>
+
+
+                    <p 
+                        v-else-if="el.type === 'paragraph'"
+                        v-html="el.content">
+                    </p>
+
+                    <div
+                      v-else-if="el.type === 'embedded'"
+                      v-html="el.content"  
+                    >
+
+                    </div>
+
+                    <ul
+                        v-else-if="el.type === 'list'"
+                    >
+                        <template v-for="(child, _) in el.children" :key="'list-'+el.id+'-'+_">
+                            <li>{{ child }}</li>
+                        </template>
+
+                    </ul>
+
+                    <blockquote 
+                        v-else-if="el.type === 'quote'" 
+                        v-html="el.content"
+                        >
+                    </blockquote>
+
+                    <div v-else-if="el.type === 'code'">
+                        <pre>
+                        <code :class="`language-${el.language}`" v-html="el.content"></code>
+                        </pre>
+
+                    </div>
+                    <a 
+                        v-else-if="el.type === 'link'" 
+                        v-html="el.content"
+                        >
+                    </a>
+
+                    <!-- <div 
+                        v-else-if="el.type == 'image'"
+                        class="image-container spotlight"
+                        :data-src="extractImgSrc(el.content)"
+                        v-html="el.content"
+                        >  -->
+                    <!-- </div> -->
+                </template>
         </div>
       </div>
   

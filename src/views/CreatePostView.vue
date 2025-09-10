@@ -58,6 +58,8 @@
               :data-id="block.id">
           </h4>
 
+          
+
           <div
             @click="selectBlock(block.id)" 
             v-else-if="block.type == 'tag'"
@@ -67,6 +69,13 @@
 
           </div>
 
+          <textarea
+            @click="selectBlock(block.id)" 
+            @focus="() => {storeSelection(); showToolbar = true;}"
+            v-else-if="block.type == 'embedded'"
+            v-model="(block as any).content"
+            :data-id="block.id"
+          ></textarea>
 
           <p @click="selectBlock(block.id)" 
             @focus="() => {storeSelection(); showToolbar = true;}"
@@ -550,6 +559,7 @@ async function save(updatedPostSettings: PostSettings) {
     // url = `http://localhost:3000/post/${route.params.id}`;
     method = 'PUT';
   }
+
   await fetch(url, {
             mode: 'cors',
             method: method,
