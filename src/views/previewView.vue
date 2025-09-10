@@ -104,10 +104,13 @@
   interface element {
     id: number,
     html: string,
+    content?: string,
+    type?:string,
     children: element[]
     attributes: string,
     editing: boolean,
     hover: boolean,
+    language?: string
   }
   
   interface PostSettings {
